@@ -9,7 +9,7 @@
 
 | ✅ | 작업 내용 | 핵심 요건 |
 | :---: | :--- | :--- |
-| [ ] | 프로젝트 폴더 및 파일 생성 | • `index.html` (메인 페이지)<br>• `css/style.css`, `js/script.js`<br>• `images/` 폴더 분리 |
+| ✅ | 프로젝트 폴더 및 파일 생성 | • `index.html` (메인 페이지)<br>• `css/style.css`, `js/script.js`<br>• `images/` 폴더 분리 |
 | [ ] | 파일 연결 | • CSS: `<link>` 태그로 연결<br>• JS: `defer` 속성 적용하여 연결 |
 | [ ] | 개발 환경 구성 | • VS Code **Live Server** 구동<br>• 실시간 새로고침 반영 확인 |
 
