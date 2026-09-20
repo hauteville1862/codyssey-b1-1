@@ -14,6 +14,7 @@
     --fig-green: #687f43;
     --fig-green-light: #edf2e4;
     --border-color: rgba(104, 127, 67, 0.22);
+    --highlighter: rgba(104, 127, 67, 0.22);
     --focus-ring: rgba(140, 43, 62, 0.18);
     --error: #a22219;
     --success: #256235;
@@ -58,6 +59,7 @@
     --fig-green: #9bb872;
     --fig-green-light: rgba(155, 184, 114, 0.14);
     --border-color: rgba(255, 255, 255, 0.08);
+    --highlighter: rgba(155, 184, 114, 0.28);
     --focus-ring: rgba(212, 136, 151, 0.35);
     --error: #ff5c52;
     --success: #3ddc58;
@@ -541,13 +543,17 @@ textarea { resize: vertical; }
     text-decoration: none;
 }
 .footer-copyright {
+    display: inline-block;
     color: var(--fig-green);
     font-weight: 400;
-    opacity: 0.85;
+    opacity: 0.9;
     font-size: 0.78rem;
     letter-spacing: -0.01em;
     margin: 0;
     text-align: center;
+    padding-inline: 0.35rem;
+    background: linear-gradient(180deg, transparent 58%, var(--highlighter) 58%);
+    border-radius: 2px;
 }
 .footer-links {
     display: flex;
