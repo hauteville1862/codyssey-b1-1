@@ -38,6 +38,17 @@ hamburgerBtn.addEventListener('click', () => {
     hamburgerBtn.setAttribute('aria-label', isOpen ? '메뉴 닫기' : '메뉴 열기');
 });
 
+// 모바일 환경에서 메뉴 링크 클릭 시 자동으로 메뉴 닫기
+navMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+        if (navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            hamburgerBtn.setAttribute('aria-expanded', 'false');
+            hamburgerBtn.setAttribute('aria-label', '메뉴 열기');
+        }
+    });
+});
+
 // 3. 폼 유효성 검사 (필드별 에러 + 이메일 형식 + input 이벤트 실시간 검증)
 const contactForm = document.querySelector('#contact-form');
 const formMsg = document.querySelector('#form-msg');

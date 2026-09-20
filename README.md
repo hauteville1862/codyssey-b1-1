@@ -32,7 +32,7 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 
 ### 배포 URL
 
-🔗 **[GitHub Pages 배포 사이트 바로가기](https://hauteville1862.github.io/b1-1/)**  
+🔗 **[GitHub Pages 배포 사이트 바로가기](https://hauteville1862.github.io/codyssey-b1-1/)**  
 *(저장소 Settings → Pages 활성화 후 접속 가능)*
 
 ### 스크린샷
