@@ -20,7 +20,7 @@
     --shadow-md: 0 8px 24px rgba(69, 22, 32, 0.08);
     --shadow-lg: 0 16px 40px rgba(69, 22, 32, 0.12);
     --font-heading: 'Nanum Myeongjo', serif;
-    --font-body: -apple-system, BlinkMacSystemFont, "Pretendard", system-ui, sans-serif;
+    --font-body: 'Nanum Gothic', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     --radius-sm: 8px;
     --radius-md: 14px;
     --radius-lg: 20px;
