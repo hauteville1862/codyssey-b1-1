@@ -138,22 +138,104 @@ scrollTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-// 6. GitHub API 연동 및 상태(Loading/Success/Error) 처리
+// 6. GitHub API 연동 및 상태(Loading/Success/Error) 처리 + 언어별 필터링 (보너스 과제)
 const GITHUB_USERNAME = 'hauteville1862'; // 현재 저장소의 GitHub 소유자
 const apiStatus = document.querySelector('#api-status');
 const repoList = document.querySelector('#repo-list');
 const retryReposBtn = document.querySelector('#retry-repos');
+const filterContainer = document.querySelector('#project-filters');
+
+let allRepos = [];         // 2단계: API로 받아온 전체 원본 프로젝트 보관
+let currentFilter = 'all'; // 현재 선택된 언어 필터 상태
 let isLoadingRepos = false;
 
+// 3단계: 전달받은 프로젝트 목록을 화면에 렌더링하는 함수 (map + 구조분해 할당)
+function renderProjects(reposToRender) {
+    if (reposToRender.length === 0) {
+        repoList.innerHTML = '<p class="repo-empty-filter">선택한 언어의 프로젝트가 없습니다.</p>';
+        return;
+    }
+
+    const htmlString = reposToRender.map(({ name, html_url, description, language, stargazers_count }) => `
+        <article class="card">
+            <div class="card-body">
+                <h3><a href="${html_url}" target="_blank" rel="noopener noreferrer">${name}</a></h3>
+                <p>${description || '설명이 없습니다.'}</p>
+            </div>
+            <div class="card-meta">
+                <span class="repo-lang">${language || '기타'}</span>
+                ${stargazers_count > 0 ? `<span class="repo-stars">★ ${stargazers_count}</span>` : ''}
+            </div>
+        </article>
+    `).join('');
+
+    repoList.innerHTML = htmlString;
+}
+
+// 필터 버튼 동적 생성 함수
+function renderFilterButtons(repos) {
+    const detectedLanguages = [...new Set(repos.map(r => r.language).filter(Boolean))];
+    const hasUntagged = repos.some(r => !r.language);
+
+    const filterList = ['all', ...detectedLanguages];
+    if (hasUntagged) {
+        filterList.push('기타');
+    }
+
+    filterContainer.innerHTML = filterList.map(lang => {
+        const label = lang === 'all' ? '전체' : lang;
+        const isActive = lang === currentFilter;
+        return `<button type="button" class="filter-btn ${isActive ? 'active' : ''}" data-language="${lang}" aria-pressed="${isActive ? 'true' : 'false'}">${label}</button>`;
+    }).join('');
+}
+
+// 5단계: Array.prototype.filter()로 조건에 맞는 프로젝트를 추출 후 화면 갱신
+function applyFilter() {
+    let filtered;
+    if (currentFilter === 'all') {
+        filtered = allRepos;
+    } else if (currentFilter === '기타') {
+        filtered = allRepos.filter(repo => !repo.language);
+    } else {
+        filtered = allRepos.filter(repo => repo.language === currentFilter);
+    }
+    renderProjects(filtered);
+}
+
+// 4단계: 필터 버튼 클릭 이벤트 등록 (이벤트 위임 패턴)
+filterContainer.addEventListener('click', (event) => {
+    const btn = event.target.closest('.filter-btn');
+    if (!btn) return;
+
+    const selectedLang = btn.dataset.language;
+    if (selectedLang === currentFilter) return;
+
+    // 상태 변경
+    currentFilter = selectedLang;
+
+    // 버튼 활성 상태(UI) 갱신
+    filterContainer.querySelectorAll('.filter-btn').forEach(b => {
+        const active = b.dataset.language === currentFilter;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+
+    // 필터링 적용 및 화면 렌더링
+    applyFilter();
+});
+
+// GitHub API 호출 함수
 async function fetchGitHubRepos() {
     if (isLoadingRepos) return;
     isLoadingRepos = true;
     retryReposBtn.disabled = true;
     retryReposBtn.hidden = true;
     repoList.innerHTML = '';
+    filterContainer.innerHTML = '';
     apiStatus.hidden = false;
     apiStatus.classList.remove('api-error');
     apiStatus.textContent = "데이터를 불러오는 중입니다...";
+
     try {
         const response = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos`);
 
@@ -169,16 +251,11 @@ async function fetchGitHubRepos() {
             return;
         }
 
-        // 성공 상태 UI 처리 (배열 메서드 map + 구조분해 할당 활용)
-        const htmlString = repos.map(({ name, html_url, description }) => `
-            <article class="card">
-                <h3><a href="${html_url}" target="_blank">${name}</a></h3>
-                <p>${description || '설명이 없습니다.'}</p>
-            </article>
-        `).join('');
-
-        repoList.innerHTML = htmlString;
+        // 데이터 보관 및 화면 렌더링
+        allRepos = repos;
         apiStatus.hidden = true;
+        renderFilterButtons(allRepos);
+        applyFilter();
 
     } catch (error) {
         // 에러 상태 UI 처리
@@ -195,3 +272,4 @@ retryReposBtn.addEventListener('click', fetchGitHubRepos);
 
 // 스크립트가 로드되면 API 호출
 fetchGitHubRepos();
+
