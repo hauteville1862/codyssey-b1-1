@@ -179,6 +179,13 @@ section { padding-block: var(--section-space); border-bottom: 1px solid var(--bo
     line-height: 1.7;
     word-break: keep-all;
 }
+.hero-highlight {
+    background: linear-gradient(180deg, transparent 58%, var(--highlighter) 58%);
+    padding-inline: 0.25rem;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    border-radius: 2px;
+}
 #hero .btn { margin-top: 2rem; }
 
 h1, h2, h3 { font-family: var(--font-heading); letter-spacing: -0.02em; font-weight: 700; color: var(--text-title); word-break: keep-all; }
@@ -531,7 +538,7 @@ textarea { resize: vertical; }
 }
 .footer-logo {
     font-family: var(--font-heading);
-    font-size: var(--text-base);
+    font-size: 1.26rem; /* 저작권 문구(0.78rem) 대비 황금비율 1.618배 */
     line-height: 1.2;
     font-weight: 700;
     color: var(--text-title);
