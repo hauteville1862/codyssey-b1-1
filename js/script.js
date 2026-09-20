@@ -10,6 +10,11 @@ if (currentTheme === 'dark') {
 }
 
 toggleBtn.addEventListener('click', () => {
+    // 개나리색 번짐 애니메이션 트리거
+    toggleBtn.classList.remove('blooming');
+    void toggleBtn.offsetWidth;
+    toggleBtn.classList.add('blooming');
+
     let theme = document.documentElement.getAttribute('data-theme');
     if (theme === 'dark') {
         document.documentElement.removeAttribute('data-theme');
