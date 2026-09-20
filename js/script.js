@@ -6,6 +6,7 @@ const currentTheme = localStorage.getItem('theme');
 
 if (currentTheme === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
+    toggleBtn.setAttribute('aria-pressed', 'true');
 }
 
 toggleBtn.addEventListener('click', () => {
@@ -13,9 +14,11 @@ toggleBtn.addEventListener('click', () => {
     if (theme === 'dark') {
         document.documentElement.removeAttribute('data-theme');
         localStorage.setItem('theme', 'light');
+        toggleBtn.setAttribute('aria-pressed', 'false');
     } else {
         document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('theme', 'dark');
+        toggleBtn.setAttribute('aria-pressed', 'true');
     }
 });
 
@@ -27,25 +30,70 @@ hamburgerBtn.addEventListener('click', () => {
     navMenu.classList.toggle('active');
 });
 
-// 3. 폼 유효성 검사 및 제출 이벤트 방지
+// 3. 폼 유효성 검사 (필드별 에러 + 이메일 형식 + input 이벤트 실시간 검증)
 const contactForm = document.querySelector('#contact-form');
 const formMsg = document.querySelector('#form-msg');
+const nameInput = document.querySelector('#name');
+const emailInput = document.querySelector('#email');
+const messageInput = document.querySelector('#message');
 
+// 개별 필드 검증 함수
+function validateField(input, errorId, customCheck) {
+    const errorEl = document.querySelector(`#${errorId}`);
+    const value = input.value.trim();
+    let message = '';
+
+    if (value === '') {
+        message = '이 항목을 입력해주세요.';
+    } else if (customCheck) {
+        message = customCheck(value);
+    }
+
+    errorEl.textContent = message;
+    input.setAttribute('aria-invalid', message ? 'true' : 'false');
+    return message === '';
+}
+
+// 이메일 형식 검증 (@ 포함 여부)
+function checkEmailFormat(value) {
+    if (!value.includes('@')) {
+        return '올바른 이메일 형식이 아닙니다. (@가 포함되어야 합니다)';
+    }
+    return '';
+}
+
+// input 이벤트: 입력 중 실시간 검증
+nameInput.addEventListener('input', () => {
+    validateField(nameInput, 'name-error');
+});
+emailInput.addEventListener('input', () => {
+    validateField(emailInput, 'email-error', checkEmailFormat);
+});
+messageInput.addEventListener('input', () => {
+    validateField(messageInput, 'message-error');
+});
+
+// submit 이벤트: 전체 검증
 contactForm.addEventListener('submit', (event) => {
-    event.preventDefault(); // 기본 제출 새로고침 방지
-    const name = document.querySelector('#name').value;
-    const email = document.querySelector('#email').value;
+    event.preventDefault();
 
-    if (name.trim() === '' || email.trim() === '') {
-        formMsg.textContent = "모든 항목을 입력해주세요.";
-        formMsg.style.color = "red";
+    const isNameValid = validateField(nameInput, 'name-error');
+    const isEmailValid = validateField(emailInput, 'email-error', checkEmailFormat);
+    const isMessageValid = validateField(messageInput, 'message-error');
+
+    if (!isNameValid || !isEmailValid || !isMessageValid) {
+        formMsg.textContent = '';
+        formMsg.className = '';
         return;
     }
 
-    // 성공 상태 변경
-    formMsg.textContent = "성공적으로 메시지가 전송되었습니다!";
-    formMsg.style.color = "green";
-    contactForm.reset(); // 폼 초기화
+    // 성공 상태
+    formMsg.textContent = '성공적으로 메시지가 전송되었습니다!';
+    formMsg.className = 'form-success';
+    contactForm.reset();
+    // 성공 후 에러 표시 초기화
+    document.querySelectorAll('.field-error').forEach(el => { el.textContent = ''; });
+    document.querySelectorAll('[aria-invalid]').forEach(el => { el.removeAttribute('aria-invalid'); });
 });
 
 // 4. 섹션 전체 대신 제목을 관찰해, 목록이 길어져도 등장하게 한다.
@@ -67,14 +115,16 @@ document.querySelectorAll('.fade-section').forEach(section => {
     }
 });
 
-// 5. 스크롤 탑 버튼
+// 5. 스크롤 탑 버튼 + 네비게이션 스크롤 스타일 변경
 const scrollTopBtn = document.querySelector('#scroll-top-btn');
+const header = document.querySelector('#header');
+
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        scrollTopBtn.style.display = 'block';
-    } else {
-        scrollTopBtn.style.display = 'none';
-    }
+    // 스크롤 300px 이상에서 스크롤 탑 버튼 표시
+    scrollTopBtn.hidden = window.scrollY <= 300;
+
+    // 스크롤 60px 이상에서 네비게이션 배경색 변경
+    header.classList.toggle('scrolled', window.scrollY > 60);
 });
 scrollTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -111,11 +161,11 @@ async function fetchGitHubRepos() {
             return;
         }
 
-        // 성공 상태 UI 처리 (배열 메서드 map 활용)
-        const htmlString = repos.map(repo => `
+        // 성공 상태 UI 처리 (배열 메서드 map + 구조분해 할당 활용)
+        const htmlString = repos.map(({ name, html_url, description }) => `
             <article class="card">
-                <h3><a href="${repo.html_url}" target="_blank">${repo.name}</a></h3>
-                <p>${repo.description || '설명이 없습니다.'}</p>
+                <h3><a href="${html_url}" target="_blank">${name}</a></h3>
+                <p>${description || '설명이 없습니다.'}</p>
             </article>
         `).join('');
 
