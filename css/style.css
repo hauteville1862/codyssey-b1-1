@@ -168,6 +168,7 @@ section { padding-block: var(--section-space); border-bottom: 1px solid var(--bo
     line-height: 1.38;
     word-break: keep-all;
     letter-spacing: -0.015em;
+    min-height: 3.2em;
 }
 #hero p {
     max-width: 38rem;
@@ -211,15 +212,14 @@ p + p { margin-top: var(--space-sm); }
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
-    align-items: flex-start;
-    text-align: left;
+    align-items: center;
     margin-top: 2rem;
 }
 .about-content > p { max-width: 65ch; line-height: 1.75; word-break: keep-all; }
 .about-list {
     list-style: disc;
     text-align: left;
-    padding-left: 1.25rem;
+    padding-left: 1.4rem;
     max-width: 65ch;
     line-height: 1.75;
     word-break: keep-all;
@@ -235,12 +235,13 @@ p + p { margin-top: var(--space-sm); }
     border-radius: var(--radius-lg);
     border: 2px solid var(--accent);
     box-shadow: 0 4px 16px var(--focus-ring);
+    margin-inline: auto;
 }
 .skills-list {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-xs);
-    justify-content: flex-start;
+    justify-content: center;
     margin-top: var(--space-md);
 }
 .skills-list li {
@@ -364,7 +365,7 @@ button:disabled { cursor: wait; opacity: 0.5; }
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-xs);
-    justify-content: flex-start;
+    justify-content: center;
     margin-top: var(--space-md);
 }
 .filter-group:empty { display: none; }
@@ -398,7 +399,7 @@ button:disabled { cursor: wait; opacity: 0.5; }
 /* Projects 카드: Grid 사용 (auto-fit, minmax로 반응형) */
 #repo-list, .grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: var(--layout-gap);
     margin-top: 0;
 }
@@ -617,6 +618,7 @@ textarea { resize: vertical; }
         font-size: clamp(2.3rem, 1.8rem + 1.6vw, 3rem);
         line-height: 1.34;
         max-width: none;
+        min-height: auto;
     }
     .typing-container {
         white-space: nowrap;
@@ -625,9 +627,10 @@ textarea { resize: vertical; }
         font-size: 1.125rem;
     }
     .about-content { flex-direction: row; align-items: center; gap: 2.5rem; }
-    .profile-image { width: 160px; height: 160px; }
+    .profile-image { width: 160px; height: 160px; margin-inline: 0; }
     .skills-list { justify-content: flex-start; gap: 0.75rem; }
     .skills-list li { padding: 0.6rem 1.2rem; }
+    .filter-group { justify-content: flex-start; }
     #repo-list, .grid-container { grid-template-columns: repeat(auto-fit, minmax(calc((100% - var(--layout-gap)) / 2), 1fr)); }
     .card { padding: 1.75rem; }
     .footer-inner { flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; }
