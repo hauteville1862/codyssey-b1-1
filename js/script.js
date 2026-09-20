@@ -95,8 +95,8 @@ contactForm.addEventListener('submit', (event) => {
         return;
     }
 
-    // 성공 상태
-    formMsg.textContent = '성공적으로 메시지가 전송되었습니다!';
+    // 성공 상태 (연습용 폼 안내)
+    formMsg.textContent = '입력 내용이 확인되었습니다. 실제 이메일은 전송되지 않았습니다.';
     formMsg.className = 'form-success';
     contactForm.reset();
     // 성공 후 에러 표시 초기화
@@ -132,10 +132,10 @@ const header = document.querySelector('#header');
 
 window.addEventListener('scroll', () => {
     // 스크롤 300px 이상에서 스크롤 탑 버튼 표시
-    scrollTopBtn.hidden = window.scrollY <= 300;
+    scrollTopBtn.hidden = window.scrollY < 300;
 
     // 스크롤 60px 이상에서 네비게이션 배경색 변경
-    header.classList.toggle('scrolled', window.scrollY > 60);
+    header.classList.toggle('scrolled', window.scrollY >= 60);
 });
 scrollTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -275,3 +275,70 @@ retryReposBtn.addEventListener('click', fetchGitHubRepos);
 
 // 스크립트가 로드되면 API 호출
 fetchGitHubRepos();
+
+// 7. Hero 섹션 타이핑 효과 (보너스 과제)
+const typingElement = document.querySelector('#typing-text');
+const typingCursor = document.querySelector('.typing-cursor');
+if (typingElement) {
+    const phrases = [
+        { accent: '성장하는 프론트엔드 개발자', suffix: '입니다.' },
+        { accent: 'AI의 코드를 내 것으로 만드는 학생', suffix: '입니다.' },
+        { accent: '내 언어로 배움을 설명하는 사람', suffix: '입니다.' }
+    ];
+    let phraseIndex = 0;
+    const firstItem = phrases[0];
+    let charIndex = firstItem.accent.length + firstItem.suffix.length;
+    let isDeleting = false;
+    let typingSpeed = 135;
+
+    function renderTyping(item, count) {
+        if (count <= item.accent.length) {
+            return `<span class="accent-text">${item.accent.substring(0, count)}</span>`;
+        } else {
+            const suffixCount = count - item.accent.length;
+            return `<span class="accent-text">${item.accent}</span>${item.suffix.substring(0, suffixCount)}`;
+        }
+    }
+
+    function typeLoop() {
+        const currentItem = phrases[phraseIndex];
+        const totalLength = currentItem.accent.length + currentItem.suffix.length;
+
+        if (isDeleting) {
+            // 한 글자씩 삭제 (백스페이스 꾹 누른 듯 매우 빠르게)
+            charIndex--;
+            typingElement.innerHTML = renderTyping(currentItem, charIndex);
+            typingSpeed = 20;
+        } else {
+            // 한 글자씩 타이핑 (또박또박 여유로운 타건감)
+            charIndex++;
+            typingElement.innerHTML = renderTyping(currentItem, charIndex);
+            typingSpeed = 135;
+        }
+
+        // 커서 색상 동기화: '입니다.' 영역에선 기본 텍스트 색, 앞 문구 영역에선 포인트 색
+        if (typingCursor) {
+            typingCursor.classList.toggle('suffix-cursor', charIndex > currentItem.accent.length);
+        }
+
+        // 문장이 완성되었을 때: 2초 동안 읽을 시간 제공
+        if (!isDeleting && charIndex === totalLength) {
+            typingSpeed = 2000;
+            isDeleting = true;
+        }
+        // 문장이 완전히 지워졌을 때: 0.35초 대기 후 다음 문구 시작
+        else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+            typingSpeed = 350;
+        }
+
+        setTimeout(typeLoop, typingSpeed);
+    }
+
+    // 초기 화면 로드 후 2초 대기 후 지우기부터 시작
+    setTimeout(() => {
+        isDeleting = true;
+        typeLoop();
+    }, 2000);
+}

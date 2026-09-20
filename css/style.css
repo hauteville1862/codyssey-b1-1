@@ -118,6 +118,10 @@ ul { list-style: none; }
     margin: 0;
     color: var(--text-title);
 }
+.header-inner h1 a {
+    color: inherit;
+    text-decoration: none;
+}
 .controls { display: flex; gap: var(--space-xs); align-items: center; margin-left: auto; }
 #nav-menu { display: none; order: 3; flex-basis: 100%; margin-top: 0.75rem; }
 #nav-menu.active { display: block; }
@@ -157,13 +161,50 @@ section { padding-block: var(--section-space); border-bottom: 1px solid var(--bo
     justify-content: center;
     padding-block: var(--section-space);
 }
-#hero h2 { max-width: 22ch; font-size: clamp(1.9rem, 1rem + 3vw, var(--text-4xl)); margin-bottom: var(--space-md); line-height: 1.35; text-wrap: balance; }
-#hero p { max-width: 42rem; font-size: clamp(var(--text-base), 0.9rem + 0.5vw, var(--text-lg)); color: var(--text-muted); word-break: keep-all; }
+#hero h2 {
+    max-width: 100%;
+    font-size: clamp(1.85rem, 5vw, 2.35rem);
+    margin-bottom: var(--space-md);
+    line-height: 1.38;
+    word-break: keep-all;
+    letter-spacing: -0.015em;
+}
+#hero p {
+    max-width: 38rem;
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+    color: var(--text-muted);
+    line-height: 1.7;
+    word-break: keep-all;
+}
 #hero .btn { margin-top: 2rem; }
 
 h1, h2, h3 { font-family: var(--font-heading); letter-spacing: -0.02em; font-weight: 700; color: var(--text-title); word-break: keep-all; }
 h2 { font-size: clamp(var(--text-xl), 1.25rem + 1vw, var(--text-2xl)); margin-bottom: var(--space-xs); line-height: 1.2; }
 .accent-text { color: var(--accent); }
+
+/* Hero 타이핑 애니메이션 */
+.typing-container {
+    display: inline-block;
+    min-height: 1.35em;
+    vertical-align: bottom;
+}
+.typing-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.05em;
+    margin-left: 2px;
+    background-color: var(--accent);
+    vertical-align: -0.1em;
+    animation: cursor-blink 0.85s infinite;
+    transition: background-color 0.15s ease;
+}
+.typing-cursor.suffix-cursor {
+    background-color: var(--text-title);
+}
+@keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
 p { color: var(--text-main); font-size: var(--text-base); }
 p + p { margin-top: var(--space-sm); }
 .about-content {
@@ -572,6 +613,17 @@ textarea { resize: vertical; }
     #nav-menu a:hover { background: transparent; }
     .controls { margin-left: 0.5rem; }
     #hamburger-btn { display: none; }
+    #hero h2 {
+        font-size: clamp(2.3rem, 1.8rem + 1.6vw, 3rem);
+        line-height: 1.34;
+        max-width: none;
+    }
+    .typing-container {
+        white-space: nowrap;
+    }
+    #hero p {
+        font-size: 1.125rem;
+    }
     .about-content { flex-direction: row; align-items: center; gap: 2.5rem; }
     .profile-image { width: 160px; height: 160px; }
     .skills-list { justify-content: flex-start; gap: 0.75rem; }
@@ -583,6 +635,15 @@ textarea { resize: vertical; }
 @media (min-width: 1024px) {
     :root { --page-gutter: 2.5rem; --section-space: 6rem; }
     .header-inner h1 { font-size: var(--text-2xl); }
+    #hero h2 {
+        font-size: clamp(2.6rem, 1.8rem + 1.8vw, 3.35rem);
+        line-height: 1.3;
+        letter-spacing: -0.02em;
+    }
+    #hero p {
+        font-size: 1.18rem;
+        line-height: 1.75;
+    }
     #nav-menu ul { gap: 1.75rem; }
     #nav-menu a { font-size: var(--text-base); }
     .about-content { gap: 3rem; }
