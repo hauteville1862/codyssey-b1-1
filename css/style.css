@@ -186,6 +186,12 @@ section { padding-block: var(--section-space); border-bottom: 1px solid var(--bo
     -webkit-box-decoration-break: clone;
     border-radius: 2px;
 }
+[data-theme="dark"] #hero p {
+    color: var(--text-main);
+}
+[data-theme="dark"] .hero-highlight {
+    color: var(--text-title);
+}
 #hero .btn { margin-top: 2rem; }
 
 h1, h2, h3 { font-family: var(--font-heading); letter-spacing: -0.02em; font-weight: 700; color: var(--text-title); word-break: keep-all; }
