@@ -1,2 +1,150 @@
-/* style.css */
+/* 모바일 화면을 기본으로 작성하고 768px, 1024px에서 확장한다. */
+:root {
+    --bg-main: #fdfbf7;
+    --bg-header: #f4ddd7;
+    --bg-header-scrolled: #e3b8b1;
+    --text-main: #5e2833;
+    --text-inverse: #fdfbf7;
+    --accent: #8c2b3e;
+    --border-color: #c2c17d;
+    --error: #a22219;
+    --success: #256235;
+    --shadow: 0 4px 16px rgb(50 20 30 / 12%);
+    --font-body: 'Nanum Myeongjo', serif;
+    --font-ui: system-ui, sans-serif;
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2rem;
+    --space-xl: 4rem;
+}
+[data-theme="dark"] {
+    --bg-main: #2a2a2a;
+    --bg-header: #34272b;
+    --bg-header-scrolled: #52363e;
+    --text-main: #fdfbf7;
+    --text-inverse: #2a2a2a;
+    --accent: #c2c17d;
+    --border-color: #96737d;
+    --error: #ffb4ab;
+    --success: #a8d5af;
+    --shadow: 0 4px 16px rgb(0 0 0 / 25%);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+    font-family: var(--font-body);
+    background: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+    transition: background-color 0.3s, color 0.3s;
+}
+a { color: inherit; text-underline-offset: 0.25em; }
+ul { list-style: none; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.skip-link { position: fixed; top: -5rem; left: var(--space-sm); z-index: 30; padding: var(--space-xs); background: var(--bg-main); }
+.skip-link:focus { top: var(--space-xs); }
 
+/* Flexbox로 로고와 메뉴의 좌우 배치를 구성한다. */
+#header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+#header.scrolled { background: var(--bg-header-scrolled); box-shadow: var(--shadow); }
+.header-inner {
+    max-width: 1200px;
+    margin-inline: auto;
+    padding: var(--space-sm);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs) var(--space-sm);
+}
+.header-inner h1 { font-size: 1.15rem; margin: 0; }
+.controls { display: flex; gap: var(--space-xs); align-items: center; margin-left: auto; }
+#nav-menu { display: none; order: 3; flex-basis: 100%; }
+#nav-menu.active { display: block; }
+#nav-menu ul { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-sm); }
+#nav-menu a { display: inline-block; padding-block: var(--space-xs); text-decoration: none; }
+#nav-menu a:hover { text-decoration: underline; }
+
+#main-content, #footer { max-width: 1200px; margin-inline: auto; padding-inline: var(--space-sm); }
+section { padding-block: var(--space-xl); border-bottom: 1px solid var(--border-color); scroll-margin-top: 11rem; }
+#hero { min-height: 65vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+h1, h2 { color: var(--accent); }
+h2 { font-size: clamp(1.6rem, 4vw, 2.5rem); margin-bottom: var(--space-md); line-height: 1.5; }
+p + p { margin-top: var(--space-sm); }
+.about-content { display: flex; flex-direction: column; gap: var(--space-lg); }
+.profile-image { width: 160px; height: 160px; object-fit: cover; border-radius: 50%; border: 2px solid var(--border-color); }
+.skills-list { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md); }
+.skills-list li { padding: var(--space-xs) var(--space-sm); border: 1px solid var(--border-color); border-radius: 0.4rem; }
+
+/* 모든 버튼에 공통으로 적용하는 모양과 효과 */
+button, .btn {
+    display: inline-block;
+    padding: 0.65rem var(--space-sm);
+    border: 1px solid var(--accent);
+    border-radius: 0.3rem;
+    background: transparent;
+    color: var(--accent);
+    font: inherit;
+    font-family: var(--font-ui);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, transform 0.2s;
+}
+button:hover, .btn:hover { background: var(--accent); color: var(--text-inverse); transform: translateY(-2px); }
+button:disabled { cursor: wait; opacity: 0.6; }
+.btn { margin-top: var(--space-sm); }
+#hamburger-btn { font-size: 1.1rem; }
+
+.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: var(--space-lg); }
+.card { min-width: 0; padding: var(--space-md); border: 1px solid var(--border-color); border-radius: 0.4rem; box-shadow: var(--shadow); transition: transform 0.3s, box-shadow 0.3s; }
+.card h3 { margin-bottom: var(--space-xs); }
+.card:hover { transform: translateY(-5px); box-shadow: 0 8px 24px rgb(50 20 30 / 20%); }
+.api-error, .field-error, .form-error { color: var(--error); }
+.form-success { color: var(--success); }
+
+#contact-form { max-width: 640px; margin-top: var(--space-lg); }
+.form-group { margin-bottom: var(--space-md); }
+label { display: block; margin-bottom: var(--space-xs); }
+input, textarea { display: block; width: 100%; padding: 0.8rem; border: 1px solid var(--border-color); border-radius: 0.3rem; background: var(--bg-main); color: var(--text-main); font: 1rem var(--font-ui); }
+textarea { resize: vertical; }
+[aria-invalid="true"] { border-color: var(--error); }
+.field-error { min-height: 1.7em; font-family: var(--font-ui); font-size: 0.9rem; }
+#form-msg { margin-top: var(--space-sm); }
+#footer { padding-block: var(--space-lg); scroll-margin-top: 11rem; }
+#footer a { display: inline-block; margin-top: var(--space-xs); }
+#scroll-top-btn { position: fixed; bottom: var(--space-sm); right: var(--space-sm); z-index: 25; background: var(--accent); color: var(--text-inverse); }
+#scroll-top-btn:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+
+/* JS가 작동할 때만 감춘다. 제목을 관찰하므로 긴 목록도 표시된다. */
+.fade-section { transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+.fade-section.reveal-pending { opacity: 0; transform: translateY(24px); }
+.fade-section.visible { opacity: 1; transform: translateY(0); }
+
+@media (min-width: 768px) {
+    .header-inner, #main-content, #footer { padding-inline: var(--space-lg); }
+    .header-inner h1 { font-size: 1.4rem; }
+    .about-content { flex-direction: row; align-items: center; }
+    section { padding-block: 5rem; }
+}
+@media (min-width: 1024px) {
+    #nav-menu { display: block; order: 0; flex-basis: auto; margin-left: auto; }
+    .controls { margin-left: 0; }
+    .mobile-only { display: none; }
+    section, #footer { scroll-margin-top: 6rem; }
+    #hero { min-height: 75vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition: none !important; }
+    .fade-section.reveal-pending { opacity: 1; transform: none; }
+}
