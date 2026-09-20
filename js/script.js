@@ -62,10 +62,10 @@ function validateField(input, errorId, customCheck) {
     return message === '';
 }
 
-// 이메일 형식 검증 (@ 포함 여부)
+// 이메일 형식 검증 (이름@도메인.확장자)
 function checkEmailFormat(value) {
-    if (!value.includes('@')) {
-        return '올바른 이메일 형식이 아닙니다. (@가 포함되어야 합니다)';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        return '이메일을 이름@도메인.확장자 형식으로 입력해주세요.';
     }
     return '';
 }
@@ -108,7 +108,9 @@ contactForm.addEventListener('submit', (event) => {
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting && entry.intersectionRatio >= 0.2) {
-            entry.target.closest('.fade-section').classList.add('visible');
+            const section = entry.target.closest('.fade-section');
+            section.classList.remove('reveal-pending');
+            section.classList.add('visible');
             observer.unobserve(entry.target);
         }
     });
@@ -117,6 +119,7 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.fade-section').forEach(section => {
     const heading = section.querySelector('h2');
     if (heading) {
+        section.classList.add('reveal-pending');
         observer.observe(heading);
     } else {
         section.classList.add('visible');
@@ -163,7 +166,7 @@ function renderProjects(reposToRender) {
                 <p>${description || '설명이 없습니다.'}</p>
             </div>
             <div class="card-meta">
-                <span class="repo-lang">${language || '기타'}</span>
+                <span class="repo-lang">${language || 'Other'}</span>
                 ${stargazers_count > 0 ? `<span class="repo-stars">★ ${stargazers_count}</span>` : ''}
             </div>
         </article>
@@ -179,11 +182,11 @@ function renderFilterButtons(repos) {
 
     const filterList = ['all', ...detectedLanguages];
     if (hasUntagged) {
-        filterList.push('기타');
+        filterList.push('Other');
     }
 
     filterContainer.innerHTML = filterList.map(lang => {
-        const label = lang === 'all' ? '전체' : lang;
+        const label = lang === 'all' ? 'All' : lang;
         const isActive = lang === currentFilter;
         return `<button type="button" class="filter-btn ${isActive ? 'active' : ''}" data-language="${lang}" aria-pressed="${isActive ? 'true' : 'false'}">${label}</button>`;
     }).join('');
@@ -194,7 +197,7 @@ function applyFilter() {
     let filtered;
     if (currentFilter === 'all') {
         filtered = allRepos;
-    } else if (currentFilter === '기타') {
+    } else if (currentFilter === 'Other') {
         filtered = allRepos.filter(repo => !repo.language);
     } else {
         filtered = allRepos.filter(repo => repo.language === currentFilter);
@@ -272,4 +275,3 @@ retryReposBtn.addEventListener('click', fetchGitHubRepos);
 
 // 스크립트가 로드되면 API 호출
 fetchGitHubRepos();
-

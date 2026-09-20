@@ -14,7 +14,7 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 - CSS3 (CSS 변수, Flexbox, Grid, 미디어 쿼리)
 - Vanilla JavaScript (ES6+)
 - GitHub REST API (`fetch` + `async/await`)
-- Google Fonts (나눔명조)
+- Google Fonts (나눔고딕, 나눔명조)
 
 ### 주요 기능
 
@@ -27,16 +27,31 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 | 스크롤 탑 버튼 | 스크롤 **300px** 이상에서 표시, 클릭 시 맨 위로 이동 |
 | 네비게이션 스타일 변경 | 스크롤 **60px** 이상에서 헤더 배경색 변경 + 그림자 추가 |
 | 스크롤 애니메이션 | Intersection Observer (threshold: **0.2**) |
-| 폼 유효성 검사 | 빈칸 검증, 이메일 `@` 형식 검증, 필드별 에러 메시지, 실시간 `input` 검증 |
+| 폼 유효성 검사 | 빈칸 검증, 이메일 `이름@도메인.확장자` 형식 검증, 필드별 에러 메시지, 실시간 `input` 검증 |
 | GitHub API 연동 | 저장소 목록 동적 렌더링, 로딩/성공/에러/빈 상태 UI |
 
 ### 배포 URL
 
-- (GitHub Pages 활성화 후 추가 예정)
+🔗 **[GitHub Pages 배포 사이트 바로가기](https://hauteville1862.github.io/b1-1/)**  
+*(저장소 Settings → Pages 활성화 후 접속 가능)*
 
 ### 스크린샷
 
-- (데스크톱/모바일/다크모드 스크린샷 추가 예정)
+| 데스크톱 화면 (1024px+) | 모바일 화면 (<768px) | 다크 모드 화면 |
+| :---: | :---: | :---: |
+| ![데스크톱 화면](images/screenshot-desktop.png) | ![모바일 화면](images/screenshot-mobile.png) | ![다크 모드 화면](images/screenshot-dark.png) |
+| *데스크톱 기본 뷰* | *모바일 햄버거 메뉴 뷰* | *다크 모드 테마 뷰* |
+
+> 💡 **스크린샷 등록 방법**: 위 경로(`images/screenshot-desktop.png`, `images/screenshot-mobile.png`, `images/screenshot-dark.png`)로 캡처 이미지를 저장하면 자동으로 표시됩니다.
+
+### 상태 관리 패턴 ("이벤트 → 상태 변경 → 화면 업데이트")
+
+| 구분 | 사용자 이벤트 | 상태 변경 | 화면 업데이트 |
+| :--- | :--- | :--- | :--- |
+| **다크 모드** | 테마 토글 버튼 클릭 | 테마 상태(`dark` ↔ `light`) 전환, `localStorage` 갱신 | `data-theme` 속성 변경, 전체 컬러 팔레트 및 아이콘 전환 |
+| **외부 API** | 페이지 로드 / 재시도 클릭 | 비동기 API 요청 상태(`loading` → `success` / `error` / `empty`) | 로딩 스피너 → 카드 그리드 / 에러 안내 / 빈 화면 동적 렌더링 |
+| **폼 검증** | 입력값 변경(`input`) / 제출(`submit`) | 필드별 유효성 상태(`valid` ↔ `invalid`) | 에러 메시지 실시간 노출/제거, `aria-invalid` 갱신, 완료 문구 표시 |
+| **필터링 (보너스)** | 언어별 필터 버튼 클릭 | `currentFilter` 상태 변경 (`All`, 언어명, `Other`) | 해당 언어 프로젝트 카드만 필터링하여 재렌더링, 활성 버튼 표시 |
 
 ---
 
@@ -91,7 +106,7 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 | ✅ | 네비게이션 스타일 변경 | • **60px** 이상 스크롤 시 헤더 배경색 변경 + 그림자 |
 | ✅ | 스크롤 애니메이션 | • Intersection Observer (threshold: **0.2**) |
 | ✅ | 다크 모드 토글 & 상태 유지 | • 테마 전환 토글 버튼 구현<br>• **localStorage** 저장으로 새로고침 유지 |
-| ✅ | Contact 폼 유효성 검사 | • 필수 입력값 빈칸 검증 (3개 필드 모두)<br>• 이메일 `@` 형식 검증<br>• 필드별 에러 메시지 표시<br>• `input` 이벤트로 실시간 검증 |
+| ✅ | Contact 폼 유효성 검사 | • 필수 입력값 빈칸 검증 (3개 필드 모두)<br>• 이메일 `이름@도메인.확장자` 형식 검증<br>• 필드별 에러 메시지 표시<br>• `input` 이벤트로 실시간 검증 |
 
 ---
 
@@ -111,10 +126,10 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 
 | ✅ | 작업 내용 | 핵심 요건 |
 | :---: | :--- | :--- |
-| ✅ | Git 커밋 및 원격 푸시 | • 전체 소스 코드 Git 커밋<br>• GitHub 원격 저장소에 푸시 |
-| [ ] | GitHub Pages 배포 | • 저장소 Settings에서 Pages 활성화<br>• 외부 접속 가능한 공개 URL 발급 |
-| [ ] | 최종 브라우저 교차 검증 | • 최신 Chrome 브라우저 정상 동작 확인<br>• 모바일/태블릿 기기 반응형 최종 점검 |
-| [ ] | 스크린샷 추가 | • 데스크톱/모바일/다크모드 스크린샷을 README에 첨부 |
+| ✅ | Git 커밋 및 원격 푸시 | • 전체 소스 코드 Git 커밋<br>• GitHub 원격 저장소(`origin/main`)에 푸시 완료 |
+| [ ] | GitHub Pages 배포 | • 저장소 `Settings → Pages`에서 `main` 브랜치 배포 활성화<br>• 공개 URL 발급 및 정상 접속 확인 |
+| [ ] | 최종 브라우저 교차 검증 | • 최신 Chrome 브라우저에서 인터랙션, API, 폼 검증 동작 확인<br>• 모바일/태블릿 반응형 및 콘솔 에러 유무 점검 |
+| [ ] | 스크린샷 첨부 | • 데스크톱, 모바일, 다크 모드 캡처 후 `images/` 폴더에 추가하여 README 표시 |
 
 ---
 
@@ -126,4 +141,3 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 | [ ] | 타이핑 효과 | • Hero 섹션에 타자기처럼 한 글자씩 나타나는 타이핑 애니메이션 구현 |
 | [ ] | 폼 실제 전송 | • Formspree 또는 EmailJS 연동으로 실제 문의 이메일 전송 |
 | [ ] | 시스템 다크 모드 감지 | • `prefers-color-scheme` 미디어 쿼리로 OS 테마 설정 자동 감지 및 초기 반영 |
-
