@@ -1,18 +1,111 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>나를 소개하는 웹페이지</title>
-
-  <!-- 1. 외부 CSS 연결 -->
-  <link rel="stylesheet" href="css/style.css">
-
-  <!-- 2. 외부 JavaScript 연결 (defer로 HTML 해석 후 실행) -->
-  <script src="js/script.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개발자 포트폴리오</title>
+    <!-- 구글 폰트 (나눔명조) -->
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- 외부 CSS 연결 -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- 외부 JS 연결 (defer 속성 사용) -->
+    <script src="js/script.js" defer></script>
 </head>
 <body>
-  <h1>나를 소개하는 웹페이지</h1>
+    <a class="skip-link" href="#main-content">본문으로 이동</a>
+    <!-- 로고는 왼쪽, 메뉴는 오른쪽에 배치 -->
+    <header id="header">
+        <div class="header-inner">
+            <h1>나의 포트폴리오</h1>
+            <nav id="nav-menu" aria-label="주요 메뉴">
+                <ul>
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#skills">Skills</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#footer">Links</a></li>
+                </ul>
+            </nav>
+            <div class="controls">
+                <button id="dark-mode-toggle" type="button" aria-pressed="false">다크 모드</button>
+                <button id="hamburger-btn" class="mobile-only" type="button" aria-label="메뉴 열기" aria-controls="nav-menu" aria-expanded="false">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+        <!-- Hero 섹션 -->
+        <section id="hero" class="fade-section">
+            <h2>안녕하세요, <br><span class="accent-text">성장하는 프론트엔드 개발자</span>입니다.</h2>
+            <p>코드에 온기를 담아냅니다.</p>
+            <a href="#projects" class="btn">프로젝트 보기</a>
+        </section>
+
+        <!-- About 섹션 -->
+        <section id="about" class="fade-section">
+            <h2>About</h2>
+            <div class="about-content">
+                <img class="profile-image" src="images/profile.png" alt="hauteville1862의 GitHub 프로필 이미지" width="160" height="160" loading="lazy">
+                <p>HTML, CSS, JavaScript를 배우며 나를 소개하는 웹페이지를 만들고 있습니다. 작은 기능을 직접 확인하고, 코드의 동작을 제 말로 설명하는 연습을 합니다.</p>
+            </div>
+        </section>
+
+        <!-- Skills 섹션: 현재 학습 중인 기술 -->
+        <section id="skills" class="fade-section">
+            <h2>Skills</h2>
+            <p>현재 배우고 있는 웹 기술입니다.</p>
+            <ul class="skills-list">
+                <li>HTML5 / CSS3</li>
+                <li>Vanilla JavaScript (ES6+)</li>
+                <li>Responsive Web Design</li>
+            </ul>
+        </section>
+
+        <!-- Projects 섹션 (GitHub API 연동) -->
+        <section id="projects" class="fade-section">
+            <h2>Projects</h2>
+            <!-- 상태를 보여줄 컨테이너 (로딩/에러/빈상태/성공) -->
+            <div id="github-container">
+                <div id="api-status" role="status" aria-live="polite">데이터를 불러오는 중입니다...</div>
+                <button id="retry-repos" class="btn" type="button" hidden>다시 시도</button>
+                <!-- JS로 동적 렌더링될 article 요소들이 들어갈 곳 -->
+                <div id="repo-list" class="grid-container"></div>
+            </div>
+        </section>
+
+        <!-- Contact 섹션 (폼 유효성 검사) -->
+        <section id="contact" class="fade-section">
+            <h2>Contact</h2>
+            <p id="form-note">입력 내용을 확인하는 연습용 폼입니다. 실제 이메일은 전송하지 않습니다.</p>
+            <form id="contact-form" novalidate aria-describedby="form-note">
+                <div class="form-group">
+                    <label for="name">이름</label>
+                    <input type="text" id="name" name="name" autocomplete="name" required aria-describedby="name-error">
+                    <p id="name-error" class="field-error" aria-live="polite"></p>
+                </div>
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <input type="email" id="email" name="email" autocomplete="email" required aria-describedby="email-error">
+                    <p id="email-error" class="field-error" aria-live="polite"></p>
+                </div>
+                <div class="form-group">
+                    <label for="message">메시지</label>
+                    <textarea id="message" name="message" rows="5" required aria-describedby="message-error"></textarea>
+                    <p id="message-error" class="field-error" aria-live="polite"></p>
+                </div>
+                <button type="submit" class="btn">입력 확인</button>
+                <p id="form-msg" role="status" aria-live="polite"></p>
+            </form>
+        </section>
+
+    </main>
+    <footer id="footer">
+        <p>&copy; 2026 hauteville1862. All rights reserved.</p>
+        <a href="https://github.com/hauteville1862" target="_blank" rel="noopener noreferrer">GitHub 프로필</a>
+    </footer>
+
+    <!-- 스크롤 탑 버튼 -->
+    <button id="scroll-top-btn" type="button" aria-label="페이지 맨 위로 이동" hidden>↑</button>
 </body>
 </html>
