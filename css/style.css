@@ -572,15 +572,15 @@ textarea { resize: vertical; }
 .footer-links a {
     color: var(--text-muted);
     font-weight: 700;
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.25em;
     font-size: inherit;
     letter-spacing: -0.01em;
-    transition: color 0.2s ease;
+    transition: text-decoration-color 0.2s ease;
 }
 .footer-links a:hover {
-    color: var(--fig-green);
-    text-decoration: underline;
-    text-underline-offset: 0.25em;
+    text-decoration-color: var(--fig-green);
 }
 .footer-links .external-arrow {
     font-size: 0.75rem;
