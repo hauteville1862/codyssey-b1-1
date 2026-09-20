@@ -10,7 +10,7 @@
     --text-inverse: #ffffff;
     --accent: #8c2b3e;
     --accent-hover: #a5374d;
-    --repo-hover: rgba(54, 16, 25, 0.7);
+    --repo-hover: #1a070c;
     --fig-green: #687f43;
     --fig-green-light: #edf2e4;
     --border-color: rgba(104, 127, 67, 0.22);
@@ -104,24 +104,34 @@ ul { list-style: none; }
     color: var(--text-title);
 }
 .controls { display: flex; gap: var(--space-xs); align-items: center; margin-left: auto; }
-#nav-menu { display: none; order: 3; flex-basis: 100%; }
+#nav-menu { display: none; order: 3; flex-basis: 100%; margin-top: 0.75rem; }
 #nav-menu.active { display: block; }
-#nav-menu ul { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-sm); }
+#nav-menu ul {
+    display: flex;
+    flex-direction: column;
+    padding-block: 0.5rem 0.25rem;
+    border-top: 1px solid var(--border-color);
+    gap: 0.2rem;
+}
 #nav-menu a {
-    display: inline-block;
-    padding-block: var(--space-xs);
+    display: block;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.98rem;
+    font-weight: 600;
     color: var(--text-title);
     text-decoration: underline;
     text-decoration-color: transparent;
     text-underline-offset: 0.3em;
-    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
 }
 #nav-menu a:hover {
     color: var(--repo-hover);
     text-decoration-color: var(--fig-green);
+    background: var(--fig-green-light);
 }
 
-#main-content { max-width: 1040px; margin-inline: auto; padding-inline: var(--space-md); }
+#main-content { max-width: 1040px; margin-inline: auto; padding-inline: 1.25rem; }
 section { padding-block: clamp(4.5rem, 8vw, 7.5rem); border-bottom: 1px solid var(--border-color); scroll-margin-top: 6rem; }
 #hero {
     min-height: calc(82vh - 60px);
@@ -143,13 +153,14 @@ p + p { margin-top: var(--space-sm); }
 .about-content {
     display: flex;
     flex-direction: column;
-    gap: clamp(1.75rem, 3.5vw, 2.5rem);
-    align-items: flex-start;
+    gap: 1.5rem;
+    align-items: center;
+    text-align: center;
     margin-top: clamp(2rem, 3.5vw, 2.75rem);
 }
 .profile-image {
-    width: 160px;
-    height: 160px;
+    width: 140px;
+    height: 140px;
     object-fit: cover;
     border-radius: var(--radius-lg);
     border: 2px solid var(--fig-green);
@@ -158,16 +169,17 @@ p + p { margin-top: var(--space-sm); }
 .skills-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 0.55rem;
+    justify-content: center;
     margin-top: clamp(1.75rem, 3vw, 2.25rem);
 }
 .skills-list li {
-    padding: 0.6rem 1.2rem;
+    padding: 0.55rem 1.05rem;
     background: var(--fig-green-light);
     color: var(--fig-green);
     border: 1px solid var(--border-color);
     border-radius: 980px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease;
@@ -252,14 +264,27 @@ button:disabled { cursor: wait; opacity: 0.5; }
 [data-theme="dark"] #dark-mode-toggle .moon-icon { display: none; }
 .btn { margin-top: var(--space-md); }
 #hamburger-btn {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
     background: transparent;
     color: var(--text-main);
-    font-size: 1.3rem;
-    padding: 0.4rem 0.6rem;
-    border: none;
-    box-shadow: none;
+    font-size: 1.2rem;
+    border: 1.5px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, color 0.2s ease;
 }
-#hamburger-btn:hover { background: var(--border-color); transform: none; box-shadow: none; }
+#hamburger-btn:hover {
+    border-color: var(--fig-green);
+    color: var(--fig-green);
+    transform: scale(1.06);
+}
+#hamburger-btn:active { transform: scale(0.94); }
 
 #github-container { margin-top: clamp(2rem, 3.5vw, 2.75rem); }
 /* Projects 카드: Grid 사용 (auto-fit, minmax로 반응형) */
@@ -271,7 +296,7 @@ button:disabled { cursor: wait; opacity: 0.5; }
 }
 .card {
     min-width: 0;
-    padding: 1.75rem 1.6rem;
+    padding: 1.35rem 1.25rem;
     background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -431,11 +456,17 @@ textarea { resize: vertical; }
     .header-inner { flex-wrap: nowrap; justify-content: space-between; }
     .header-inner h1 { font-size: 1.4rem; }
     /* 네비게이션: Flexbox 사용 (로고 왼쪽, 메뉴 오른쪽) */
-    #nav-menu { display: flex; order: 0; flex-basis: auto; margin-left: auto; align-items: center; }
-    #nav-menu ul { display: flex; flex-direction: row; gap: 1.25rem; }
+    #nav-menu { display: flex; order: 0; flex-basis: auto; margin-left: auto; align-items: center; margin-top: 0; }
+    #nav-menu ul { display: flex; flex-direction: row; gap: 1.25rem; padding: 0; border-top: none; }
+    #nav-menu a { display: inline-block; padding: var(--space-xs) 0; }
+    #nav-menu a:hover { background: transparent; }
     .controls { margin-left: 1.25rem; }
     .mobile-only { display: none; }
-    .about-content { flex-direction: row; align-items: center; }
+    .about-content { flex-direction: row; align-items: center; text-align: left; }
+    .profile-image { width: 160px; height: 160px; }
+    .skills-list { justify-content: flex-start; gap: 0.75rem; }
+    .skills-list li { padding: 0.6rem 1.2rem; font-size: 0.95rem; }
+    .card { padding: 1.75rem 1.6rem; }
     .footer-inner { flex-direction: row; justify-content: space-between; align-items: center; }
 }
 @media (min-width: 1024px) {
