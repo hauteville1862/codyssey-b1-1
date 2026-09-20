@@ -28,6 +28,9 @@ const navMenu = document.querySelector('#nav-menu');
 
 hamburgerBtn.addEventListener('click', () => {
     navMenu.classList.toggle('active');
+    const isOpen = navMenu.classList.contains('active');
+    hamburgerBtn.setAttribute('aria-expanded', isOpen);
+    hamburgerBtn.setAttribute('aria-label', isOpen ? '메뉴 닫기' : '메뉴 열기');
 });
 
 // 3. 폼 유효성 검사 (필드별 에러 + 이메일 형식 + input 이벤트 실시간 검증)
