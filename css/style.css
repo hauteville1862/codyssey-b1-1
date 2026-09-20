@@ -2,8 +2,8 @@
 :root {
     --bg-main: #fdfbf7;
     --bg-surface: #ffffff;
-    --bg-header: rgba(244, 221, 215, 0.8);
-    --bg-header-scrolled: rgba(227, 184, 177, 0.88);
+    --bg-header: linear-gradient(135deg, rgba(186, 212, 152, 0.88) 0%, rgba(248, 200, 188, 0.88) 45%, rgba(219, 146, 164, 0.88) 100%);
+    --bg-header-scrolled: linear-gradient(135deg, rgba(176, 204, 138, 0.95) 0%, rgba(245, 188, 174, 0.95) 45%, rgba(212, 132, 152, 0.95) 100%);
     --text-main: #5e2833;
     --text-muted: #8a5763;
     --text-inverse: #fdfbf7;
@@ -12,6 +12,7 @@
     --fig-green: #687f43;
     --fig-green-light: #eef2e6;
     --border-color: rgba(104, 127, 67, 0.25);
+    --focus-ring: rgba(140, 43, 62, 0.18);
     --error: #a22219;
     --success: #256235;
     --shadow-sm: 0 2px 8px rgba(94, 40, 51, 0.05);
@@ -29,23 +30,24 @@
     --space-xl: 5rem;
 }
 [data-theme="dark"] {
-    --bg-main: #1f181a;
-    --bg-surface: #2b2023;
-    --bg-header: rgba(36, 26, 29, 0.8);
-    --bg-header-scrolled: rgba(52, 39, 43, 0.88);
-    --text-main: #fdfbf7;
-    --text-muted: #c9a4ac;
-    --text-inverse: #1f181a;
-    --accent: #e2a8b3;
-    --accent-hover: #f1c1ca;
-    --fig-green: #97b56a;
-    --fig-green-light: #2c3820;
-    --border-color: rgba(151, 181, 106, 0.25);
-    --error: #ffb4ab;
-    --success: #a8d5af;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
-    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
+    --bg-main: #161619;
+    --bg-surface: #222227;
+    --bg-header: linear-gradient(135deg, rgba(42, 56, 26, 0.88) 0%, rgba(68, 46, 38, 0.88) 45%, rgba(66, 28, 38, 0.88) 100%);
+    --bg-header-scrolled: linear-gradient(135deg, rgba(42, 56, 26, 0.95) 0%, rgba(68, 46, 38, 0.95) 45%, rgba(66, 28, 38, 0.95) 100%);
+    --text-main: #f5f5f7;
+    --text-muted: #9c9ca1;
+    --text-inverse: #ffffff;
+    --accent: #c97a8c;
+    --accent-hover: #d98d9e;
+    --fig-green: #92b066;
+    --fig-green-light: rgba(146, 176, 102, 0.14);
+    --border-color: rgba(255, 255, 255, 0.09);
+    --focus-ring: rgba(201, 122, 140, 0.35);
+    --error: #ff453a;
+    --success: #32d74b;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.48);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -205,7 +207,7 @@ input, textarea {
 input:focus, textarea:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(140, 43, 62, 0.18);
+    box-shadow: 0 0 0 3px var(--focus-ring);
 }
 textarea { resize: vertical; }
 [aria-invalid="true"] { border-color: var(--error); }
