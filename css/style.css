@@ -1,23 +1,24 @@
 /* 모바일 화면을 기본으로 작성하고 768px, 1024px에서 확장한다. */
 :root {
-    --bg-main: #fbf9f4;
+    --bg-main: #fcfaf6;
     --bg-surface: #ffffff;
-    --bg-header: rgba(251, 249, 244, 0.75);
-    --bg-header-scrolled: rgba(251, 249, 244, 0.90);
-    --text-main: #5e2833;
-    --text-muted: #8a5763;
-    --text-inverse: #fbf9f4;
+    --bg-header: rgba(252, 250, 246, 0.82);
+    --bg-header-scrolled: rgba(252, 250, 246, 0.94);
+    --text-title: #361019;
+    --text-main: #451620;
+    --text-muted: #733e4a;
+    --text-inverse: #ffffff;
     --accent: #8c2b3e;
     --accent-hover: #a5374d;
     --fig-green: #687f43;
-    --fig-green-light: #eef2e6;
-    --border-color: rgba(104, 127, 67, 0.25);
+    --fig-green-light: #edf2e4;
+    --border-color: rgba(104, 127, 67, 0.22);
     --focus-ring: rgba(140, 43, 62, 0.18);
     --error: #a22219;
     --success: #256235;
-    --shadow-sm: 0 2px 8px rgba(94, 40, 51, 0.05);
-    --shadow-md: 0 8px 24px rgba(94, 40, 51, 0.09);
-    --shadow-lg: 0 16px 40px rgba(94, 40, 51, 0.14);
+    --shadow-sm: 0 2px 8px rgba(69, 22, 32, 0.04);
+    --shadow-md: 0 8px 24px rgba(69, 22, 32, 0.08);
+    --shadow-lg: 0 16px 40px rgba(69, 22, 32, 0.12);
     --font-heading: 'Nanum Myeongjo', serif;
     --font-body: -apple-system, BlinkMacSystemFont, "Pretendard", system-ui, sans-serif;
     --radius-sm: 8px;
@@ -30,27 +31,29 @@
     --space-xl: 5rem;
 }
 [data-theme="dark"] {
-    --bg-main: #161619;
-    --bg-surface: #222227;
-    --bg-header: rgba(22, 22, 25, 0.75);
-    --bg-header-scrolled: rgba(22, 22, 25, 0.90);
-    --text-main: #f5f5f7;
-    --text-muted: #9c9ca1;
+    --bg-main: #181516;
+    --bg-surface: #221d1f;
+    --bg-header: rgba(24, 21, 22, 0.82);
+    --bg-header-scrolled: rgba(24, 21, 22, 0.94);
+    --text-title: #f5f3f4;
+    --text-main: #cfccd0;
+    --text-muted: #918b93;
     --text-inverse: #ffffff;
-    --accent: #c97a8c;
-    --accent-hover: #d98d9e;
-    --fig-green: #92b066;
-    --fig-green-light: rgba(146, 176, 102, 0.14);
-    --border-color: rgba(255, 255, 255, 0.09);
-    --focus-ring: rgba(201, 122, 140, 0.35);
-    --error: #ff453a;
-    --success: #32d74b;
+    --accent: #d48897;
+    --accent-hover: #e29cb7;
+    --fig-green: #9bb872;
+    --fig-green-light: rgba(155, 184, 114, 0.14);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --focus-ring: rgba(212, 136, 151, 0.35);
+    --error: #ff5c52;
+    --success: #3ddc58;
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.48);
-    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.60);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
+::selection { background: var(--fig-green-light); color: var(--fig-green); }
 body {
     font-family: var(--font-body);
     background: var(--bg-main);
@@ -64,8 +67,8 @@ a { color: inherit; text-underline-offset: 0.25em; }
 ul { list-style: none; }
 [hidden] { display: none !important; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: var(--radius-sm); }
-.skip-link { position: fixed; top: -5rem; left: var(--space-sm); z-index: 30; padding: var(--space-xs) var(--space-sm); background: var(--bg-surface); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); }
-.skip-link:focus { top: var(--space-xs); }
+.skip-link { position: fixed; top: -5rem; left: var(--space-sm); z-index: 30; padding: var(--space-xs) var(--space-sm); background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); }
+.skip-link:focus { top: var(--space-xs); border-color: var(--fig-green); color: var(--fig-green); }
 
 /* Flexbox로 로고와 메뉴의 좌우 배치를 구성한다. (애플 글래스모피즘 헤더) */
 #header {
@@ -96,22 +99,22 @@ ul { list-style: none; }
     letter-spacing: -0.01em;
     text-transform: lowercase;
     margin: 0;
-    color: var(--text-main);
+    color: var(--text-title);
 }
 .controls { display: flex; gap: var(--space-xs); align-items: center; margin-left: auto; }
 #nav-menu { display: none; order: 3; flex-basis: 100%; }
 #nav-menu.active { display: block; }
 #nav-menu ul { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-sm); }
-#nav-menu a { display: inline-block; padding-block: var(--space-xs); text-decoration: none; }
-#nav-menu a:hover { text-decoration: underline; }
+#nav-menu a { display: inline-block; padding-block: var(--space-xs); text-decoration: none; transition: color 0.2s ease; }
+#nav-menu a:hover { color: var(--fig-green); text-decoration: underline; text-underline-offset: 0.3em; }
 
 #main-content, #footer { max-width: 1040px; margin-inline: auto; padding-inline: var(--space-md); }
 section { padding-block: var(--space-xl); border-bottom: 1px solid var(--border-color); scroll-margin-top: 6rem; }
 #hero { min-height: 70vh; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
-h1, h2, h3 { font-family: var(--font-heading); letter-spacing: -0.025em; font-weight: 700; color: var(--text-main); }
+h1, h2, h3 { font-family: var(--font-heading); letter-spacing: -0.025em; font-weight: 700; color: var(--text-title); }
 h2 { font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: var(--space-md); line-height: 1.25; }
 .accent-text { color: var(--accent); }
-p { color: var(--text-muted); font-size: 1.05rem; }
+p { color: var(--text-main); font-size: 1.05rem; }
 p + p { margin-top: var(--space-sm); }
 .about-content { display: flex; flex-direction: column; gap: var(--space-lg); align-items: flex-start; }
 .profile-image {
@@ -119,8 +122,8 @@ p + p { margin-top: var(--space-sm); }
     height: 160px;
     object-fit: cover;
     border-radius: var(--radius-lg);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
+    border: 2px solid var(--fig-green);
+    box-shadow: 0 4px 16px var(--fig-green-light);
 }
 .skills-list { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-md); }
 .skills-list li {
@@ -234,11 +237,14 @@ button:disabled { cursor: wait; opacity: 0.5; }
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
 }
 .card h3 { margin-bottom: var(--space-xs); font-size: 1.2rem; }
-.card p { font-size: 0.95rem; margin-bottom: var(--space-sm); }
-.card a { color: var(--accent); font-weight: 500; }
-.card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--accent); }
+.card p { font-size: 0.95rem; margin-bottom: var(--space-sm); color: var(--text-muted); }
+.card a { color: var(--accent); font-weight: 500; transition: color 0.2s ease; }
+.card a:hover { color: var(--fig-green); }
+.card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--fig-green); }
+#api-status { display: inline-block; padding: 0.6rem 1.2rem; border-radius: 980px; background: var(--fig-green-light); color: var(--fig-green); font-size: 0.95rem; font-weight: 600; border: 1px solid var(--border-color); }
 .api-error, .field-error, .form-error { color: var(--error); }
-.form-success { color: var(--success); font-weight: 500; }
+#api-status.api-error { background: rgba(255, 92, 82, 0.12); color: var(--error); border-color: rgba(255, 92, 82, 0.25); }
+.form-success { color: var(--fig-green); background: var(--fig-green-light); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--fig-green); font-weight: 600; }
 
 #contact-form { max-width: 540px; margin-top: var(--space-lg); }
 .form-group { margin-bottom: var(--space-md); }
@@ -264,8 +270,8 @@ textarea { resize: vertical; }
 .field-error { min-height: 1.7em; font-size: 0.85rem; font-weight: 500; margin-top: 0.3rem; }
 #form-msg { margin-top: var(--space-sm); }
 #footer { padding-block: var(--space-xl); text-align: center; color: var(--text-muted); font-size: 0.9rem; }
-#footer a { color: var(--accent); text-decoration: none; margin-left: 0.5rem; }
-#footer a:hover { text-decoration: underline; }
+#footer a { color: var(--accent); text-decoration: none; margin-left: 0.5rem; transition: color 0.2s ease; }
+#footer a:hover { color: var(--fig-green); text-decoration: underline; }
 #scroll-top-btn {
     position: fixed;
     bottom: var(--space-md);
@@ -280,8 +286,15 @@ textarea { resize: vertical; }
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-md);
     font-size: 1.1rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
-#scroll-top-btn:hover { background: var(--bg-main); transform: scale(1.08); box-shadow: var(--shadow-lg); }
+#scroll-top-btn:hover {
+    background: var(--fig-green-light);
+    color: var(--fig-green);
+    border-color: var(--fig-green);
+    transform: scale(1.08);
+    box-shadow: var(--shadow-lg);
+}
 
 /* JS가 작동할 때만 감춘다. 제목을 관찰하므로 긴 목록도 표시된다. */
 .fade-section { transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
