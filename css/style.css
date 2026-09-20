@@ -10,6 +10,7 @@
     --text-inverse: #ffffff;
     --accent: #8c2b3e;
     --accent-hover: #a5374d;
+    --repo-hover: rgba(54, 16, 25, 0.7);
     --fig-green: #687f43;
     --fig-green-light: #edf2e4;
     --border-color: rgba(104, 127, 67, 0.22);
@@ -41,6 +42,7 @@
     --text-inverse: #ffffff;
     --accent: #d48897;
     --accent-hover: #e29cb7;
+    --repo-hover: #ffffff;
     --fig-green: #9bb872;
     --fig-green-light: rgba(155, 184, 114, 0.14);
     --border-color: rgba(255, 255, 255, 0.08);
@@ -237,9 +239,30 @@ button:disabled { cursor: wait; opacity: 0.5; }
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
 }
 .card h3 { margin-bottom: var(--space-xs); font-size: 1.2rem; }
+.card h3 a {
+    color: var(--text-title);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.25em;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+.card h3 a:hover {
+    color: var(--repo-hover);
+    text-decoration-color: var(--fig-green);
+}
 .card p { font-size: 0.95rem; margin-bottom: var(--space-sm); color: var(--text-muted); }
-.card a { color: var(--accent); font-weight: 500; transition: color 0.2s ease; }
-.card a:hover { color: var(--fig-green); }
+.card a {
+    color: var(--accent);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.25em;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+.card a:hover {
+    color: var(--repo-hover);
+    text-decoration-color: var(--fig-green);
+}
 .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--fig-green); }
 #api-status { display: inline-block; padding: 0.6rem 1.2rem; border-radius: 980px; background: var(--fig-green-light); color: var(--fig-green); font-size: 0.95rem; font-weight: 600; border: 1px solid var(--border-color); }
 .api-error, .field-error, .form-error { color: var(--error); }
