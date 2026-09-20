@@ -541,7 +541,9 @@ textarea { resize: vertical; }
     text-decoration: none;
 }
 .footer-copyright {
-    color: var(--text-muted);
+    color: var(--fig-green);
+    font-weight: 700;
+    opacity: 0.85;
     font-size: inherit;
     letter-spacing: -0.01em;
     margin: 0;
