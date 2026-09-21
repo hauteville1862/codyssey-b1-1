@@ -13,13 +13,13 @@
     --repo-hover: #1a070c;
     --fig-green: #687f43;
     --fig-green-light: #edf2e4;
-    --border-color: rgba(104, 127, 67, 0.22);
+    --border-color: rgba(104, 127, 67, 0.12);
     --highlighter: rgba(104, 127, 67, 0.22);
     --focus-ring: rgba(140, 43, 62, 0.18);
     --error: #a22219;
     --success: #256235;
-    --shadow-sm: 0 2px 8px rgba(69, 22, 32, 0.04);
-    --shadow-md: 0 8px 24px rgba(69, 22, 32, 0.08);
+    --shadow-sm: 0 4px 16px rgba(69, 22, 32, 0.05);
+    --shadow-md: 0 12px 32px rgba(69, 22, 32, 0.09);
     --shadow-lg: 0 16px 40px rgba(69, 22, 32, 0.12);
     --font-heading: 'Nanum Myeongjo', serif;
     --font-body: 'Nanum Gothic', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -96,7 +96,7 @@ ul { list-style: none; }
     background: var(--bg-header);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1.5px solid var(--accent);
+    border-bottom: 1px solid var(--border-color);
     transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
 }
 #header.scrolled { background: var(--bg-header-scrolled); box-shadow: var(--shadow-sm); }
@@ -408,10 +408,10 @@ button:disabled { cursor: wait; opacity: 0.5; }
     justify-content: space-between;
     padding: 1.25rem;
     background: var(--bg-surface);
-    border: 1px solid var(--border-color);
+    border: none;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .card-body { flex: 1; }
 .card-meta {
@@ -621,7 +621,6 @@ textarea { resize: vertical; }
     .card:hover {
         transform: translateY(-4px);
         box-shadow: var(--shadow-md);
-        border-color: var(--fig-green);
     }
     .card h3 a:hover,
     .card a:hover {
