@@ -33,7 +33,7 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 ### 배포 URL
 
 🔗 **[GitHub Pages 배포 사이트 바로가기](https://hauteville1862.github.io/codyssey-b1-1/)**  
-*(저장소 Settings → Pages 활성화 후 접속 가능)*
+*(배포 완료 및 정상 서빙 확인)*
 
 ### 스크린샷
 
@@ -167,8 +167,8 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 
 | 상태 | 세부 항목 | 세부 요건 |
 | :---: | :--- | :--- |
-| ❌ | GitHub Pages 배포 | • GitHub 저장소 `Settings → Pages`에서 `main` 브랜치 배포 활성화 |
-| ❌ | 배포 사이트 정상 동작 검증 | • 배포 URL에서 반응형 레이아웃, 인터랙션, API, 폼 검증 등 전체 동작 확인 |
+| ✅ | GitHub Pages 배포 | • GitHub 저장소 `Settings → Pages`에서 `main` 브랜치 배포 활성화 (배포 완료) |
+| ✅ | 배포 사이트 정상 동작 검증 | • 배포 URL에서 반응형 레이아웃, 인터랙션, API, 폼 검증 등 전체 동작 확인 |
 | ❌ | README 스크린샷 첨부 | • 데스크톱, 모바일, 다크 모드 캡처 후 `images/`에 추가하여 README 표시 |
 
 ---
