@@ -162,24 +162,27 @@ section { padding-block: var(--section-space); border-bottom: 1px solid var(--bo
     align-items: flex-start;
     justify-content: center;
     padding-block: var(--section-space);
+    --hero-title-size: clamp(1.75rem, 1.15rem + 2.1vw, 3.25rem);
+    --hero-ratio: 0.42; /* 데스크톱 기준 큰 글씨와 작은 글씨의 비례 계수 */
 }
 #hero h2 {
     max-width: 100%;
-    font-size: clamp(1.85rem, 5vw, 2.35rem);
-    margin-bottom: var(--space-md);
-    line-height: 1.38;
+    font-size: var(--hero-title-size);
+    margin-bottom: clamp(0.55rem, calc(var(--hero-title-size) * 0.32), 1.15rem);
+    line-height: 1.35;
     word-break: keep-all;
     letter-spacing: -0.015em;
-    min-height: 3.2em;
+    min-height: 2.8em;
 }
 #hero p {
     max-width: 38rem;
-    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+    font-size: max(0.85rem, calc(var(--hero-title-size) * var(--hero-ratio)));
     color: var(--text-muted);
     line-height: 1.7;
     word-break: keep-all;
 }
 .hero-highlight {
+    color: var(--text-title);
     background: linear-gradient(180deg, transparent 58%, var(--highlighter) 58%);
     padding-inline: 0.25rem;
     box-decoration-break: clone;
@@ -634,16 +637,12 @@ textarea { resize: vertical; }
     .controls { margin-left: 0.5rem; }
     #hamburger-btn { display: none; }
     #hero h2 {
-        font-size: clamp(2.3rem, 1.8rem + 1.6vw, 3rem);
         line-height: 1.34;
         max-width: none;
         min-height: auto;
     }
     .typing-container {
         white-space: nowrap;
-    }
-    #hero p {
-        font-size: 1.125rem;
     }
     .about-content { flex-direction: row; align-items: center; gap: 2.5rem; }
     .profile-image { width: 160px; height: 160px; margin-inline: 0; }
@@ -667,12 +666,10 @@ textarea { resize: vertical; }
     :root { --page-gutter: 2.5rem; --section-space: 6rem; }
     .header-inner h1 { font-size: var(--text-2xl); }
     #hero h2 {
-        font-size: clamp(2.6rem, 1.8rem + 1.8vw, 3.35rem);
         line-height: 1.3;
         letter-spacing: -0.02em;
     }
     #hero p {
-        font-size: 1.18rem;
         line-height: 1.75;
     }
     #nav-menu ul { gap: 1.75rem; }
