@@ -21,6 +21,7 @@
     --shadow-sm: 0 4px 16px rgba(69, 22, 32, 0.05);
     --shadow-md: 0 12px 32px rgba(69, 22, 32, 0.09);
     --shadow-lg: 0 16px 40px rgba(69, 22, 32, 0.12);
+    --shadow-divider: 0 16px 32px -16px rgba(69, 22, 32, 0.05);
     --font-heading: 'Nanum Myeongjo', serif;
     --font-body: 'Nanum Gothic', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     /* 1rem을 기준으로 단계마다 1.25배. 역할별로 필요한 단계만 사용한다. */
@@ -66,6 +67,7 @@
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
     --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.60);
+    --shadow-divider: 0 16px 32px -16px rgba(0, 0, 0, 0.45);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -151,7 +153,20 @@ ul { list-style: none; }
 #nav-menu a:active { opacity: 0.7; }
 
 #main-content { max-width: var(--page-width); margin-inline: auto; padding-inline: var(--page-gutter); }
-section { padding-block: var(--section-space); border-bottom: 1px solid var(--border-color); scroll-margin-top: 6rem; }
+section {
+    padding-block: var(--section-space);
+    border-bottom: none;
+    background-image: linear-gradient(90deg, transparent 0%, var(--border-color) 15%, var(--border-color) 85%, transparent 100%);
+    background-position: bottom;
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
+    box-shadow: var(--shadow-divider);
+    scroll-margin-top: 6rem;
+}
+section:last-of-type {
+    background-image: none;
+    box-shadow: none;
+}
 #hero {
     min-height: clamp(28rem, 72svh, 42rem);
     display: flex;
@@ -501,7 +516,11 @@ textarea { resize: vertical; }
 #form-msg { margin-top: var(--space-sm); }
 #footer {
     width: 100%;
-    border-top: 1px solid var(--border-color);
+    border-top: none;
+    background-image: linear-gradient(90deg, transparent 0%, var(--border-color) 15%, var(--border-color) 85%, transparent 100%);
+    background-position: top;
+    background-size: 100% 1px;
+    background-repeat: no-repeat;
     padding-block: clamp(2.5rem, 4vw, 3.5rem);
     margin-top: 0;
     color: var(--text-muted);
