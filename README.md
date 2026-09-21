@@ -38,12 +38,12 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 
 ### 스크린샷
 
-| 데스크톱 화면 (1024px+) | 모바일 화면 (<768px) | 다크 모드 화면 |
+| 화면 구분 | 라이트 모드 (기본 테마) | 다크 모드 (야간 테마) |
 | :---: | :---: | :---: |
-| ![데스크톱 화면](images/screenshot-desktop.png) | ![모바일 화면](images/screenshot-mobile.png) | ![다크 모드 화면](images/screenshot-dark.png) |
-| *데스크톱 기본 뷰* | *모바일 햄버거 메뉴 뷰* | *다크 모드 테마 뷰* |
+| **데스크톱**<br>(1024px+) | ![데스크톱 라이트 모드](images/screenshot-desktop-light.png) | ![데스크톱 다크 모드](images/screenshot-desktop-dark.png) |
+| **모바일**<br>(<768px) | ![모바일 라이트 모드](images/screenshot-mobile-light.jpg) | ![모바일 다크 모드](images/screenshot-mobile-dark.jpg) |
 
-> 💡 **스크린샷 등록 방법**: 위 경로(`images/screenshot-desktop.png`, `images/screenshot-mobile.png`, `images/screenshot-dark.png`)로 캡처 이미지를 저장하면 자동으로 표시됩니다.
+> 💡 **스크린샷 안내**: 데스크톱 및 모바일 환경에서 라이트 모드와 다크 모드를 각각 실행한 실제 캡처 화면 4종입니다.
 
 ### 상태 관리 패턴 ("이벤트 → 상태 변경 → 화면 업데이트")
 
@@ -170,7 +170,7 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 | :---: | :--- | :--- |
 | ✅ | GitHub Pages 배포 | • GitHub 저장소 `Settings → Pages`에서 `main` 브랜치 배포 활성화 (배포 완료) |
 | ✅ | 배포 사이트 정상 동작 검증 | • 배포 URL에서 반응형 레이아웃, 인터랙션, API, 폼 검증 등 전체 동작 확인 |
-| ❌ | README 스크린샷 첨부 | • 데스크톱, 모바일, 다크 모드 캡처 후 `images/`에 추가하여 README 표시 |
+| ✅ | README 스크린샷 첨부 | • 데스크톱, 모바일, 다크 모드 캡처 후 `images/`에 추가하여 README 표시 (4종 등록 완료) |
 
 ---
 
