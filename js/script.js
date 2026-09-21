@@ -1,19 +1,39 @@
 // script.js
 
-// 1. 다크 모드 (로컬스토리지 상태 유지)
+// ==========================================================================
+// 단일 중앙 상태 관리 객체 (Single Source of Truth)
+// "이벤트 발생 → STATE 상태 갱신 → 화면 렌더링(render)" 흐름으로 일관되게 관리한다.
+// ==========================================================================
+const STATE = {
+    theme: 'light',            // 테마 상태: 'light' | 'dark'
+    allRepos: [],              // API로 받아온 전체 프로젝트 목록
+    currentFilter: 'all',      // 현재 선택된 언어 필터: 'all' | 언어명 | 'Other'
+    isLoadingRepos: false      // API 호출 로딩 진행 여부
+};
+
+// 1. 다크 모드 (로컬스토리지 상태 유지 및 STATE 연동)
 const toggleBtn = document.querySelector('#dark-mode-toggle');
-let currentTheme = null;
 try {
-    currentTheme = localStorage.getItem('theme');
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+        STATE.theme = savedTheme;
+    }
 } catch (error) {
     // 저장소 접근이 차단되어도 나머지 기능은 실행한다.
     console.warn('저장된 테마를 읽을 수 없습니다.', error);
 }
 
-if (currentTheme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    toggleBtn.setAttribute('aria-pressed', 'true');
+// 테마 상태(STATE.theme)를 화면 DOM에 반영하는 렌더 함수
+function renderTheme() {
+    if (STATE.theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        toggleBtn.setAttribute('aria-pressed', 'true');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        toggleBtn.setAttribute('aria-pressed', 'false');
+    }
 }
+renderTheme();
 
 toggleBtn.addEventListener('click', () => {
     // 개나리색 번짐 애니메이션 트리거
@@ -21,18 +41,15 @@ toggleBtn.addEventListener('click', () => {
     void toggleBtn.offsetWidth;
     toggleBtn.classList.add('blooming');
 
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    let nextTheme = 'dark';
-    if (isDark) {
-        nextTheme = 'light';
-        document.documentElement.removeAttribute('data-theme');
-        toggleBtn.setAttribute('aria-pressed', 'false');
-    } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        toggleBtn.setAttribute('aria-pressed', 'true');
-    }
+    // 1. 상태 갱신: STATE.theme 토글
+    STATE.theme = STATE.theme === 'dark' ? 'light' : 'dark';
+
+    // 2. 화면 렌더링
+    renderTheme();
+
+    // 3. 부수 효과: 로컬스토리지 저장
     try {
-        localStorage.setItem('theme', nextTheme);
+        localStorage.setItem('theme', STATE.theme);
     } catch (error) {
         // 저장할 수 없어도 현재 화면의 테마 전환은 유지한다.
         console.warn('테마를 저장할 수 없습니다.', error);
@@ -184,10 +201,6 @@ const repoList = document.querySelector('#repo-list');
 const retryReposBtn = document.querySelector('#retry-repos');
 const filterContainer = document.querySelector('#project-filters');
 
-let allRepos = [];         // API로 받아온 전체 프로젝트 보관
-let currentFilter = 'all'; // 현재 선택된 언어 필터 상태
-let isLoadingRepos = false;
-
 // API의 글자를 HTML 태그나 속성으로 해석하지 않도록 바꾼다.
 function escapeHtml(value) {
     return String(value)
@@ -238,7 +251,7 @@ function renderFilterButtons(repos) {
 
     filterContainer.innerHTML = filterList.map(lang => {
         const label = lang === 'all' ? 'All' : lang;
-        const isActive = lang === currentFilter;
+        const isActive = lang === STATE.currentFilter;
         return `<button type="button" class="filter-btn ${isActive ? 'active' : ''}" data-language="${escapeHtml(lang)}" aria-pressed="${isActive}">${escapeHtml(label)}</button>`;
     }).join('');
 }
@@ -246,12 +259,12 @@ function renderFilterButtons(repos) {
 // filter로 선택한 언어의 프로젝트만 골라 화면을 갱신한다.
 function applyFilter() {
     let filtered;
-    if (currentFilter === 'all') {
-        filtered = allRepos;
-    } else if (currentFilter === 'Other') {
-        filtered = allRepos.filter(repo => !repo.language);
+    if (STATE.currentFilter === 'all') {
+        filtered = STATE.allRepos;
+    } else if (STATE.currentFilter === 'Other') {
+        filtered = STATE.allRepos.filter(repo => !repo.language);
     } else {
-        filtered = allRepos.filter(repo => repo.language === currentFilter);
+        filtered = STATE.allRepos.filter(repo => repo.language === STATE.currentFilter);
     }
     renderProjects(filtered);
 }
@@ -262,14 +275,14 @@ filterContainer.addEventListener('click', (event) => {
     if (!btn) return;
 
     const selectedLang = btn.dataset.language;
-    if (selectedLang === currentFilter) return;
+    if (selectedLang === STATE.currentFilter) return;
 
     // 상태 변경
-    currentFilter = selectedLang;
+    STATE.currentFilter = selectedLang;
 
     // 버튼 활성 상태(UI) 갱신
     filterContainer.querySelectorAll('.filter-btn').forEach(b => {
-        const active = b.dataset.language === currentFilter;
+        const active = b.dataset.language === STATE.currentFilter;
         b.classList.toggle('active', active);
         b.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
@@ -280,10 +293,10 @@ filterContainer.addEventListener('click', (event) => {
 
 // GitHub API 호출 함수
 async function fetchGitHubRepos() {
-    if (isLoadingRepos) return;
-    isLoadingRepos = true;
-    allRepos = [];
-    currentFilter = 'all';
+    if (STATE.isLoadingRepos) return;
+    STATE.isLoadingRepos = true;
+    STATE.allRepos = [];
+    STATE.currentFilter = 'all';
     retryReposBtn.disabled = true;
     retryReposBtn.hidden = true;
     repoList.innerHTML = '';
@@ -308,9 +321,9 @@ async function fetchGitHubRepos() {
         }
 
         // 데이터 보관 및 화면 렌더링
-        allRepos = repos;
+        STATE.allRepos = repos;
         apiStatus.hidden = true;
-        renderFilterButtons(allRepos);
+        renderFilterButtons(STATE.allRepos);
         applyFilter();
 
     } catch (error) {
@@ -319,7 +332,7 @@ async function fetchGitHubRepos() {
         apiStatus.classList.add('api-error');
         retryReposBtn.hidden = false;
     } finally {
-        isLoadingRepos = false;
+        STATE.isLoadingRepos = false;
         retryReposBtn.disabled = false;
     }
 }

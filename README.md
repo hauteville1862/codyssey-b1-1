@@ -49,10 +49,11 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 
 | 구분 | 사용자 이벤트 | 상태 변경 | 화면 업데이트 |
 | :--- | :--- | :--- | :--- |
-| **다크 모드** | 테마 토글 버튼 클릭 | 테마 상태(`dark` ↔ `light`) 전환, `localStorage` 갱신 | `data-theme` 속성 변경, 전체 컬러 팔레트 및 아이콘 전환 |
-| **외부 API** | 페이지 로드 / 재시도 클릭 | 비동기 API 요청 상태(`loading` → `success` / `error` / `empty`) | 로딩 스피너 → 카드 그리드 / 에러 안내 / 빈 화면 동적 렌더링 |
-| **폼 검증** | 입력값 변경(`input`) / 제출(`submit`) | 필드별 유효성 상태(`valid` ↔ `invalid`) | 에러 메시지 실시간 노출/제거, `aria-invalid` 갱신, 완료 문구 표시 |
-| **필터링 (보너스)** | 언어별 필터 버튼 클릭 | `currentFilter` 상태 변경 (`All`, 언어명, `Other`) | 해당 언어 프로젝트 카드만 필터링하여 재렌더링, 활성 버튼 표시 |
+| **중앙 상태 관리** | 애플리케이션 전반 | 단일 상태 객체 `STATE` (`theme`, `allRepos`, `currentFilter`, `isLoadingRepos`) | 상태 변경 시 해당 UI 컴포넌트 렌더 함수 실행 |
+| **다크 모드** | 테마 토글 버튼 클릭 | `STATE.theme` (`dark` ↔ `light`) 전환, `localStorage` 갱신 | `renderTheme()` 호출, `data-theme` 속성 및 아이콘 전환 |
+| **외부 API** | 페이지 로드 / 재시도 클릭 | 비동기 API 요청 상태 (`STATE.isLoadingRepos`, `STATE.allRepos`) | 로딩 스피너 → 카드 그리드 / 에러 안내 / 빈 화면 동적 렌더링 |
+| **폼 검증** | 입력값 변경(`input`) / 제출(`submit`) | 필드별 유효성 상태 (`valid` ↔ `invalid`) | 에러 메시지 실시간 노출/제거, `aria-invalid` 갱신, 완료 문구 표시 |
+| **필터링 (보너스)** | 언어별 필터 버튼 클릭 | `STATE.currentFilter` 상태 변경 (`All`, 언어명, `Other`) | 해당 언어 프로젝트 카드만 필터링하여 재렌더링, 활성 버튼 표시 |
 
 ---
 
@@ -157,10 +158,11 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 
 | 상태 | 흐름 항목 | 세부 흐름 설명 |
 | :---: | :--- | :--- |
-| ✅ | 테마 상태 흐름 | 토글 클릭 → `theme` 상태 변경 (`light`/`dark`) & 저장 → `data-theme` 반영 |
-| ✅ | API 요청 상태 흐름 | 페이지 로드/재시도 클릭 → `apiState` 변경(`loading`/`success`/`error`/`empty`) → 카드 그리드/메시지 동적 렌더링 |
+| ✅ | 단일 상태 객체 (`STATE`) | `theme`, `allRepos`, `currentFilter`, `isLoadingRepos`를 단일 중앙 상태 객체(`STATE`)로 통합 관리 |
+| ✅ | 테마 상태 흐름 | 토글 클릭 → `STATE.theme` 갱신 & 저장 → `renderTheme()` 화면 반영 |
+| ✅ | API 요청 상태 흐름 | 페이지 로드/재시도 클릭 → `STATE.isLoadingRepos` 및 API 응답 갱신 → 카드 그리드 동적 렌더링 |
 | ✅ | 폼 검증 상태 흐름 | 실시간 `input`/`submit` → 유효성 상태 판단 → 에러 메시지 노출/초기화 및 완료 안내 |
-| ✅ | 필터 상태 흐름 | 필터 버튼 클릭 → `currentFilter` 상태 갱신 → 일치하는 언어 카드만 재렌더링 |
+| ✅ | 필터 상태 흐름 | 필터 버튼 클릭 → `STATE.currentFilter` 갱신 → 일치하는 언어 카드만 재렌더링 |
 
 ---
 
