@@ -250,7 +250,7 @@ p + p { margin-top: var(--space-sm); }
     width: 140px;
     height: 140px;
     object-fit: cover;
-    border-radius: var(--radius-lg);
+    border-radius: 50%;
     border: 2px solid var(--accent);
     box-shadow: 0 4px 16px var(--focus-ring);
     margin-inline: auto;
