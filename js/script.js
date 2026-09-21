@@ -2,7 +2,13 @@
 
 // 1. 다크 모드 (로컬스토리지 상태 유지)
 const toggleBtn = document.querySelector('#dark-mode-toggle');
-const currentTheme = localStorage.getItem('theme');
+let currentTheme = null;
+try {
+    currentTheme = localStorage.getItem('theme');
+} catch (error) {
+    // 저장소 접근이 차단되어도 나머지 기능은 실행한다.
+    console.warn('저장된 테마를 읽을 수 없습니다.', error);
+}
 
 if (currentTheme === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
@@ -15,15 +21,21 @@ toggleBtn.addEventListener('click', () => {
     void toggleBtn.offsetWidth;
     toggleBtn.classList.add('blooming');
 
-    let theme = document.documentElement.getAttribute('data-theme');
-    if (theme === 'dark') {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    let nextTheme = 'dark';
+    if (isDark) {
+        nextTheme = 'light';
         document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'light');
         toggleBtn.setAttribute('aria-pressed', 'false');
     } else {
         document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
         toggleBtn.setAttribute('aria-pressed', 'true');
+    }
+    try {
+        localStorage.setItem('theme', nextTheme);
+    } catch (error) {
+        // 저장할 수 없어도 현재 화면의 테마 전환은 유지한다.
+        console.warn('테마를 저장할 수 없습니다.', error);
     }
 });
 
@@ -82,6 +94,12 @@ function checkEmailFormat(value) {
 }
 
 // input 이벤트: 입력 중 실시간 검증
+contactForm.addEventListener('input', () => {
+    // 새 입력에는 이전 제출의 성공 안내를 표시하지 않는다.
+    formMsg.textContent = '';
+    formMsg.className = '';
+});
+
 nameInput.addEventListener('input', () => {
     validateField(nameInput, 'name-error');
 });
@@ -111,8 +129,12 @@ contactForm.addEventListener('submit', (event) => {
     formMsg.className = 'form-success';
     contactForm.reset();
     // 성공 후 에러 표시 초기화
-    document.querySelectorAll('.field-error').forEach(el => { el.textContent = ''; });
-    document.querySelectorAll('[aria-invalid]').forEach(el => { el.removeAttribute('aria-invalid'); });
+    contactForm.querySelectorAll('.field-error').forEach(error => {
+        error.textContent = '';
+    });
+    contactForm.querySelectorAll('[aria-invalid]').forEach(input => {
+        input.removeAttribute('aria-invalid');
+    });
 });
 
 // 4. 섹션 전체 대신 제목을 관찰해, 목록이 길어져도 등장하게 한다.
@@ -141,13 +163,16 @@ document.querySelectorAll('.fade-section').forEach(section => {
 const scrollTopBtn = document.querySelector('#scroll-top-btn');
 const header = document.querySelector('#header');
 
-window.addEventListener('scroll', () => {
+function updateScrollState() {
     // 스크롤 300px 이상에서 스크롤 탑 버튼 표시
     scrollTopBtn.hidden = window.scrollY < 300;
 
     // 스크롤 60px 이상에서 네비게이션 배경색 변경
     header.classList.toggle('scrolled', window.scrollY >= 60);
-});
+}
+window.addEventListener('scroll', updateScrollState);
+window.addEventListener('pageshow', updateScrollState);
+updateScrollState();
 scrollTopBtn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
@@ -159,11 +184,21 @@ const repoList = document.querySelector('#repo-list');
 const retryReposBtn = document.querySelector('#retry-repos');
 const filterContainer = document.querySelector('#project-filters');
 
-let allRepos = [];         // 2단계: API로 받아온 전체 원본 프로젝트 보관
+let allRepos = [];         // API로 받아온 전체 프로젝트 보관
 let currentFilter = 'all'; // 현재 선택된 언어 필터 상태
 let isLoadingRepos = false;
 
-// 3단계: 전달받은 프로젝트 목록을 화면에 렌더링하는 함수 (map + 구조분해 할당)
+// API의 글자를 HTML 태그나 속성으로 해석하지 않도록 바꾼다.
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+}
+
+// 전달받은 프로젝트 목록을 카드로 표시한다. (map + 구조분해 할당)
 function renderProjects(reposToRender) {
     if (reposToRender.length === 0) {
         repoList.innerHTML = '<p class="repo-empty-filter">선택한 언어의 프로젝트가 없습니다.</p>';
@@ -173,12 +208,12 @@ function renderProjects(reposToRender) {
     const htmlString = reposToRender.map(({ name, html_url, description, language, stargazers_count }) => `
         <article class="card">
             <div class="card-body">
-                <h3><a href="${html_url}" target="_blank" rel="noopener noreferrer">${name}</a></h3>
-                <p>${description || '설명이 없습니다.'}</p>
+                <h3><a href="${escapeHtml(html_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(name)}</a></h3>
+                <p>${escapeHtml(description || '설명이 없습니다.')}</p>
             </div>
             <div class="card-meta">
-                <span class="repo-lang">${language || 'Other'}</span>
-                ${stargazers_count > 0 ? `<span class="repo-stars">★ ${stargazers_count}</span>` : ''}
+                <span class="repo-lang">${escapeHtml(language || 'Other')}</span>
+                ${stargazers_count > 0 ? `<span class="repo-stars">★ ${escapeHtml(stargazers_count)}</span>` : ''}
             </div>
         </article>
     `).join('');
@@ -188,10 +223,15 @@ function renderProjects(reposToRender) {
 
 // 필터 버튼 동적 생성 함수
 function renderFilterButtons(repos) {
-    const detectedLanguages = [...new Set(repos.map(r => r.language).filter(Boolean))];
-    const hasUntagged = repos.some(r => !r.language);
-
-    const filterList = ['all', ...detectedLanguages];
+    const filterList = ['all'];
+    let hasUntagged = false;
+    repos.forEach(repo => {
+        if (!repo.language) {
+            hasUntagged = true;
+        } else if (!filterList.includes(repo.language)) {
+            filterList.push(repo.language);
+        }
+    });
     if (hasUntagged) {
         filterList.push('Other');
     }
@@ -199,11 +239,11 @@ function renderFilterButtons(repos) {
     filterContainer.innerHTML = filterList.map(lang => {
         const label = lang === 'all' ? 'All' : lang;
         const isActive = lang === currentFilter;
-        return `<button type="button" class="filter-btn ${isActive ? 'active' : ''}" data-language="${lang}" aria-pressed="${isActive ? 'true' : 'false'}">${label}</button>`;
+        return `<button type="button" class="filter-btn ${isActive ? 'active' : ''}" data-language="${escapeHtml(lang)}" aria-pressed="${isActive}">${escapeHtml(label)}</button>`;
     }).join('');
 }
 
-// 5단계: Array.prototype.filter()로 조건에 맞는 프로젝트를 추출 후 화면 갱신
+// filter로 선택한 언어의 프로젝트만 골라 화면을 갱신한다.
 function applyFilter() {
     let filtered;
     if (currentFilter === 'all') {
@@ -216,7 +256,7 @@ function applyFilter() {
     renderProjects(filtered);
 }
 
-// 4단계: 필터 버튼 클릭 이벤트 등록 (이벤트 위임 패턴)
+// 필터 영역에서 클릭한 버튼을 찾는다.
 filterContainer.addEventListener('click', (event) => {
     const btn = event.target.closest('.filter-btn');
     if (!btn) return;
@@ -242,6 +282,8 @@ filterContainer.addEventListener('click', (event) => {
 async function fetchGitHubRepos() {
     if (isLoadingRepos) return;
     isLoadingRepos = true;
+    allRepos = [];
+    currentFilter = 'all';
     retryReposBtn.disabled = true;
     retryReposBtn.hidden = true;
     repoList.innerHTML = '';
