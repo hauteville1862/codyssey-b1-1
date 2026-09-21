@@ -584,7 +584,12 @@ textarea { resize: vertical; }
     -webkit-tap-highlight-color: transparent;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
-#scroll-top-btn:active { transform: scale(0.92); }
+#scroll-top-btn:active {
+    transform: scale(0.92);
+    background: var(--accent);
+    color: var(--text-inverse);
+    border-color: var(--accent);
+}
 
 /* JS가 작동할 때만 감춘다. 제목을 관찰하므로 긴 목록도 표시된다. */
 .fade-section { transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
@@ -636,9 +641,9 @@ textarea { resize: vertical; }
         text-decoration-color: var(--fig-green);
     }
     #scroll-top-btn:hover {
-        background: var(--fig-green-light);
-        color: var(--fig-green);
-        border-color: var(--fig-green);
+        background: var(--accent);
+        color: var(--text-inverse);
+        border-color: var(--accent);
         transform: scale(1.08);
         box-shadow: var(--shadow-lg);
     }
