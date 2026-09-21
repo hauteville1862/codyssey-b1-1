@@ -14,6 +14,7 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 - CSS3 (CSS 변수, Flexbox, Grid, 미디어 쿼리)
 - Vanilla JavaScript (ES6+)
 - GitHub REST API (`fetch` + `async/await`)
+- Git & GitHub Pages (버전 관리 및 정적 웹 배포)
 - Google Fonts (나눔고딕, 나눔명조)
 
 ### 주요 기능
