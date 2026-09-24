@@ -11,9 +11,10 @@
     --accent: #8c2b3e;
     --accent-hover: #a5374d;
     --repo-hover: #1a070c;
-    --fig-green: #687f43;
+    --fig-green: #506731;
     --fig-green-light: #edf2e4;
     --border-color: rgba(104, 127, 67, 0.12);
+    --border-control: #858b79;
     --highlighter: rgba(104, 127, 67, 0.22);
     --focus-ring: rgba(140, 43, 62, 0.18);
     --error: #a22219;
@@ -25,7 +26,7 @@
     --font-heading: 'Nanum Myeongjo', serif;
     --font-body: 'Nanum Gothic', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     /* 1rem을 기준으로 단계마다 1.25배. 역할별로 필요한 단계만 사용한다. */
-    --text-sm: 0.8rem;
+    --text-sm: 0.875rem;
     --text-base: 1rem;
     --text-lg: 1.25rem;
     --text-xl: 1.5625rem;
@@ -52,7 +53,7 @@
     --bg-header-scrolled: rgba(24, 21, 22, 0.94);
     --text-title: #f5f3f4;
     --text-main: #cfccd0;
-    --text-muted: #918b93;
+    --text-muted: #a59da5;
     --text-inverse: #181516;
     --accent: #d48897;
     --accent-hover: #e29cb7;
@@ -60,6 +61,7 @@
     --fig-green: #9bb872;
     --fig-green-light: rgba(155, 184, 114, 0.14);
     --border-color: rgba(255, 255, 255, 0.08);
+    --border-control: #817982;
     --highlighter: rgba(155, 184, 114, 0.28);
     --focus-ring: rgba(212, 136, 151, 0.35);
     --error: #ff5c52;
@@ -188,7 +190,7 @@ section:last-of-type {
 }
 #hero p {
     max-width: 38rem;
-    font-size: max(0.85rem, calc(var(--hero-title-size) * var(--hero-ratio)));
+    font-size: max(1rem, calc(var(--hero-title-size) * var(--hero-ratio)));
     color: var(--text-muted);
     line-height: 1.7;
     word-break: keep-all;
@@ -210,7 +212,7 @@ section:last-of-type {
 #hero .btn { margin-top: 2rem; }
 
 h1, h2, h3 { font-family: var(--font-heading); letter-spacing: -0.02em; font-weight: 700; color: var(--text-title); word-break: keep-all; }
-h2 { font-size: clamp(var(--text-xl), 1.25rem + 1vw, var(--text-2xl)); margin-bottom: var(--space-xs); line-height: 1.2; }
+h2 { font-size: clamp(var(--text-xl), 1.25rem + 1vw, var(--text-2xl)); margin-bottom: var(--space-sm); line-height: 1.35; }
 .accent-text { color: var(--accent); }
 
 /* Hero 타이핑 애니메이션 */
@@ -433,8 +435,8 @@ button:disabled { cursor: wait; opacity: 0.5; }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: var(--space-xs);
-    padding-top: var(--space-xs);
+    margin-top: var(--space-md);
+    padding-top: var(--space-sm);
     border-top: 1px solid var(--border-color);
 }
 .repo-lang {
@@ -465,7 +467,7 @@ button:disabled { cursor: wait; opacity: 0.5; }
     color: var(--text-muted);
     font-size: var(--text-base);
 }
-.card h3 { margin-bottom: 0.5rem; font-size: 1.15rem; line-height: 1.4; }
+.card h3 { margin-bottom: 0.75rem; font-size: var(--text-lg); line-height: 1.45; }
 .card h3 a {
     color: var(--text-title);
     text-decoration: underline;
@@ -474,7 +476,7 @@ button:disabled { cursor: wait; opacity: 0.5; }
     -webkit-tap-highlight-color: transparent;
     transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
-.card p { font-size: max(0.875rem, var(--text-sm)); line-height: 1.6; margin-bottom: 0; color: var(--text-muted); }
+.card p { font-size: var(--text-base); line-height: 1.75; margin-bottom: 0; color: var(--text-muted); }
 .card a {
     color: var(--accent);
     font-weight: inherit;
@@ -492,17 +494,18 @@ button:disabled { cursor: wait; opacity: 0.5; }
 #contact-form { width: 100%; max-width: 480px; margin-top: 1.5rem; }
 #contact-form > .btn { margin-top: 0; }
 #form-note { max-width: 42rem; word-break: keep-all; }
-.form-group { margin-bottom: 0.85rem; }
-label { display: block; margin-bottom: 0.3rem; font-weight: 700; font-size: 0.95rem; }
+.form-group { margin-bottom: var(--space-sm); }
+label { display: block; margin-bottom: var(--space-xs); font-weight: 700; font-size: var(--text-base); }
 input, textarea {
     display: block;
     width: 100%;
-    padding: 0.65rem 0.85rem;
-    border: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-control);
     border-radius: var(--radius-sm);
     background: var(--bg-surface);
     color: var(--text-main);
-    font: 400 0.95rem/1.55 var(--font-body);
+    font: 400 1rem/1.6 var(--font-body);
+    caret-color: var(--accent);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 input:focus, textarea:focus {
@@ -511,6 +514,8 @@ input:focus, textarea:focus {
     box-shadow: 0 0 0 3px var(--focus-ring);
 }
 textarea { resize: vertical; }
+input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1; }
+::selection { color: var(--text-inverse); background: var(--accent); }
 [aria-invalid="true"] { border-color: var(--error); }
 .field-error { min-height: 1.7em; font-size: max(0.875rem, var(--text-sm)); font-weight: 400; margin-top: var(--space-xs); }
 #form-msg { margin-top: var(--space-sm); }
@@ -539,7 +544,7 @@ textarea { resize: vertical; }
 }
 .footer-logo {
     font-family: var(--font-heading);
-    font-size: 1.26rem; /* 저작권 문구(0.78rem) 대비 황금비율 1.618배 */
+    font-size: var(--text-lg);
     line-height: 1.2;
     font-weight: 700;
     color: var(--text-title);
@@ -554,8 +559,7 @@ textarea { resize: vertical; }
     display: inline-block;
     color: var(--fig-green);
     font-weight: 400;
-    opacity: 0.9;
-    font-size: 0.78rem;
+    font-size: var(--text-sm);
     letter-spacing: -0.01em;
     margin: 0;
     text-align: center;
@@ -629,6 +633,7 @@ textarea { resize: vertical; }
         transform: scale(1.08);
     }
     #hamburger-btn:hover {
+        background: var(--fig-green-light);
         border-color: var(--fig-green);
         color: var(--fig-green);
         transform: scale(1.06);
@@ -636,11 +641,16 @@ textarea { resize: vertical; }
     .skills-list li:hover {
         transform: translateY(-2px);
     }
-    .filter-btn:hover {
+    .filter-btn:not(.active):hover {
         color: var(--fig-green);
         border-color: var(--fig-green);
         background: var(--fig-green-light);
         transform: translateY(-1px);
+    }
+    .filter-btn.active:hover {
+        background: var(--fig-green);
+        color: var(--text-inverse);
+        border-color: var(--fig-green);
     }
     .card:hover {
         transform: translateY(-4px);
@@ -684,16 +694,13 @@ textarea { resize: vertical; }
         max-width: none;
         min-height: auto;
     }
-    .typing-container {
-        white-space: nowrap;
-    }
     .about-content { flex-direction: row; align-items: center; gap: 2.5rem; }
     .profile-image { width: 160px; height: 160px; margin-inline: 0; }
     .skills-list { justify-content: flex-start; gap: 0.75rem; }
     .skills-list li { padding: 0.6rem 1.2rem; }
     .filter-group { justify-content: flex-start; }
     #repo-list, .grid-container { grid-template-columns: repeat(auto-fit, minmax(calc((100% - var(--layout-gap)) / 2), 1fr)); }
-    .card { padding: 1.35rem; }
+    .card { padding: var(--space-md); }
     .footer-inner {
         display: grid;
         grid-template-columns: 1fr auto 1fr;
@@ -730,6 +737,7 @@ textarea { resize: vertical; }
 }
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    *, *::before, *::after { transition: none !important; }
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+    .typing-cursor { display: none; }
     .fade-section.reveal-pending { opacity: 1; transform: none; }
 }

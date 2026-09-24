@@ -10,6 +10,7 @@ const STATE = {
     currentFilter: 'all',      // 현재 선택된 언어 필터: 'all' | 언어명 | 'Other'
     isLoadingRepos: false      // API 호출 로딩 진행 여부
 };
+const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 // 1. 다크 모드 (로컬스토리지 상태 유지 및 STATE 연동)
 const toggleBtn = document.querySelector('#dark-mode-toggle');
@@ -191,7 +192,7 @@ window.addEventListener('scroll', updateScrollState);
 window.addEventListener('pageshow', updateScrollState);
 updateScrollState();
 scrollTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: motionPreference.matches ? 'auto' : 'smooth' });
 });
 
 // 6. GitHub API 연동 및 상태(Loading/Success/Error) 처리 + 언어별 필터링 (보너스 과제)
@@ -356,6 +357,7 @@ if (typingElement) {
     let charIndex = firstItem.accent.length + firstItem.suffix.length;
     let isDeleting = false;
     let typingSpeed = 135;
+    let typingTimer;
 
     function renderTyping(item, count) {
         if (count <= item.accent.length) {
@@ -367,6 +369,7 @@ if (typingElement) {
     }
 
     function typeLoop() {
+        if (motionPreference.matches) return;
         const currentItem = phrases[phraseIndex];
         const totalLength = currentItem.accent.length + currentItem.suffix.length;
 
@@ -399,12 +402,21 @@ if (typingElement) {
             typingSpeed = 350;
         }
 
-        setTimeout(typeLoop, typingSpeed);
+        typingTimer = setTimeout(typeLoop, typingSpeed);
     }
 
-    // 초기 화면 로드 후 2초 대기 후 지우기부터 시작
-    setTimeout(() => {
+    // 움직임 감소 설정에서는 완성 문장을 유지한다. 설정 변경 시 기존 예약도 취소한다.
+    function syncTypingMotion() {
+        clearTimeout(typingTimer);
+        phraseIndex = 0;
+        charIndex = firstItem.accent.length + firstItem.suffix.length;
         isDeleting = true;
-        typeLoop();
-    }, 2000);
+        typingElement.innerHTML = renderTyping(firstItem, charIndex);
+        if (typingCursor) typingCursor.classList.add('suffix-cursor');
+        if (!motionPreference.matches) {
+            typingTimer = setTimeout(typeLoop, 2000);
+        }
+    }
+    motionPreference.addEventListener('change', syncTypingMotion);
+    syncTypingMotion();
 }
