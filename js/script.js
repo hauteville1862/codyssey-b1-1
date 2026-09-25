@@ -37,11 +37,6 @@ function renderTheme() {
 renderTheme();
 
 toggleBtn.addEventListener('click', () => {
-    // 개나리색 번짐 애니메이션 트리거
-    toggleBtn.classList.remove('blooming');
-    void toggleBtn.offsetWidth;
-    toggleBtn.classList.add('blooming');
-
     // 1. 상태 갱신: STATE.theme 토글
     STATE.theme = STATE.theme === 'dark' ? 'light' : 'dark';
 
@@ -121,8 +116,16 @@ contactForm.addEventListener('input', () => {
 nameInput.addEventListener('input', () => {
     validateField(nameInput, 'name-error');
 });
-emailInput.addEventListener('input', () => {
+// 이메일은 입력을 마치거나 제출할 때 처음 검사한다.
+emailInput.addEventListener('blur', () => {
     validateField(emailInput, 'email-error', checkEmailFormat);
+});
+emailInput.addEventListener('input', () => {
+    // 한 번 검사한 뒤에는 입력하면서 오류가 해소되는지 확인한다.
+    // 제출 성공 후 aria-invalid가 제거되면 다시 첫 입력 상태가 된다.
+    if (emailInput.hasAttribute('aria-invalid')) {
+        validateField(emailInput, 'email-error', checkEmailFormat);
+    }
 });
 messageInput.addEventListener('input', () => {
     validateField(messageInput, 'message-error');

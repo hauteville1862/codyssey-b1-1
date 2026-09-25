@@ -271,22 +271,23 @@ p + p { margin-top: var(--space-sm); }
 }
 .skills-list {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-xs);
-    justify-content: center;
+    flex-direction: column;
+    gap: var(--space-sm);
+    max-width: 65ch;
     margin-top: var(--space-md);
 }
 .skills-list li {
-    padding: 0.55rem 1.05rem;
-    background: var(--fig-green-light);
-    color: var(--fig-green);
-    border: 1px solid var(--border-color);
-    border-radius: 980px;
+    display: grid;
+    grid-template-columns: 1.5em minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.75rem;
+    color: var(--text-main);
     font-size: var(--text-base);
-    font-weight: 700;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.2s ease;
+    font-weight: 400;
+    word-break: keep-all;
 }
+.skills-list strong { color: var(--fig-green); font-weight: 700; }
+.skill-emoji { text-align: center; }
 /* 모든 버튼에 공통으로 적용하는 모양과 효과 (애플 필 스타일 둥근 버튼) */
 button, .btn {
     display: inline-flex;
@@ -327,32 +328,6 @@ button:disabled { cursor: wait; opacity: 0.5; }
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 #dark-mode-toggle:active { transform: scale(0.94); }
-#dark-mode-toggle::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(0.6);
-    background: radial-gradient(circle, rgba(255, 215, 0, 0.85) 0%, rgba(255, 195, 15, 0.45) 45%, rgba(255, 180, 0, 0) 75%);
-    opacity: 0;
-    pointer-events: none;
-}
-#dark-mode-toggle.blooming::after {
-    animation: forsythia-bloom 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-@keyframes forsythia-bloom {
-    0% {
-        transform: translate(-50%, -50%) scale(0.6);
-        opacity: 0.95;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(2.8);
-        opacity: 0;
-    }
-}
 #dark-mode-toggle .sun-icon { display: none; }
 #dark-mode-toggle .moon-icon { display: block; }
 [data-theme="dark"] #dark-mode-toggle .sun-icon { display: block; }
@@ -627,9 +602,10 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1
         box-shadow: var(--shadow-md);
     }
     #dark-mode-toggle:hover {
-        border-color: #ffd000;
-        color: #e6a700;
-        box-shadow: 0 0 16px rgba(255, 208, 0, 0.45);
+        background: transparent;
+        border-color: var(--accent-hover);
+        color: var(--accent-hover);
+        box-shadow: var(--shadow-sm);
         transform: scale(1.08);
     }
     #hamburger-btn:hover {
@@ -637,9 +613,6 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1
         border-color: var(--fig-green);
         color: var(--fig-green);
         transform: scale(1.06);
-    }
-    .skills-list li:hover {
-        transform: translateY(-2px);
     }
     .filter-btn:not(.active):hover {
         color: var(--fig-green);
@@ -696,10 +669,8 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1
     }
     .about-content { flex-direction: row; align-items: center; gap: 2.5rem; }
     .profile-image { width: 160px; height: 160px; margin-inline: 0; }
-    .skills-list { justify-content: flex-start; gap: 0.75rem; }
-    .skills-list li { padding: 0.6rem 1.2rem; }
     .filter-group { justify-content: flex-start; }
-    #repo-list, .grid-container { grid-template-columns: repeat(auto-fit, minmax(calc((100% - var(--layout-gap)) / 2), 1fr)); }
+    #repo-list, .grid-container { grid-template-columns: repeat(auto-fill, minmax(calc((100% - var(--layout-gap)) / 2), 1fr)); }
     .card { padding: var(--space-md); }
     .footer-inner {
         display: grid;
@@ -727,7 +698,7 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1
     .about-content { gap: 3rem; }
     .profile-image { width: 180px; height: 180px; }
     /* 화면 폭과 카드 수에 맞춰 열을 채운다. 모든 행은 가장 긴 카드 높이에 맞춘다. */
-    #repo-list, .grid-container { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); grid-auto-rows: 1fr; }
+    #repo-list, .grid-container { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); grid-auto-rows: 1fr; }
     .card { min-height: 14.5rem; }
     #contact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); grid-template-rows: auto 1fr; column-gap: 3.5rem; align-content: start; }
     #contact h2 { grid-column: 1; grid-row: 1; align-self: end; }
