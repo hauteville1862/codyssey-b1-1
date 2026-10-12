@@ -55,7 +55,48 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 
 ---
 
-## B1-1 — 나를 소개하는 웹페이지 처음부터 만들기 체크리스트
+## 평가기준 체크리스트
+
+평가기준의 문구를 그대로 옮겼습니다. 설명하거나 동작을 시연할 수 있으면 체크하세요. 항목 1에는 관련 코드 위치를 연결했습니다.
+
+### 항목 1
+
+| 체크 | 번호 | 평가기준 | 관련 코드 |
+| :---: | :---: | :--- | :--- |
+| ☐ | 1-1 | 브라우저 창 크기를 줄였을 때 레이아웃이 모바일에 맞게 변경되는가? | [CSS 모바일 기본 메뉴](https://github.com/hauteville1862/codyssey-b1-1/blob/main/css/style.css#L132-L133), [768px 화면 규칙](https://github.com/hauteville1862/codyssey-b1-1/blob/main/css/style.css#L654), [카드 Grid](https://github.com/hauteville1862/codyssey-b1-1/blob/main/css/style.css#L390) |
+| ☐ | 1-2 | 테마 토글 버튼 클릭 시 다크/라이트 모드가 전환되고, 새로고침 후에도 유지되는가? | [테마 상태·저장·화면 반영](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L12-L56), [다크 모드 CSS](https://github.com/hauteville1862/codyssey-b1-1/blob/main/css/style.css#L48-L70) |
+| ☐ | 1-3 | 햄버거 메뉴, 스크롤 애니메이션, 맨 위로 가기 버튼 등이 정상 동작하는가? | [햄버거 메뉴](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L56), [스크롤 애니메이션](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L162), [맨 위로 가기](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L184) |
+| ☐ | 1-4 | GitHub API에서 데이터를 불러와 화면에 표시되고, 로딩/에러/빈 상태가 구분되는가? | [API 요청과 상태 처리](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L299) |
+| ☐ | 1-5 | 필수 입력값 누락, 이메일 형식 오류 시 즉각적인 피드백이 표시되는가? | [폼 검증 코드](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L85), [폼 HTML](https://github.com/hauteville1862/codyssey-b1-1/blob/main/index.html#L105) |
+
+### 항목 2
+
+| 체크 | 번호 | 평가기준 |
+| :---: | :---: | :--- |
+| ☐ | 2-1 | HTML, CSS, JavaScript가 각각의 파일로 분리되어 있고, 분리한 이유와 각 파일의 역할을 구분하여 답변할 수 있는가? |
+| ☐ | 2-2 | header, nav, main, section, footer 등 시맨틱 태그를 사용했고, 어떤 기준으로 태그를 선택했는지 설명할 수 있는가? |
+| ☐ | 2-3 | CSS 변수(:root)로 색상, 폰트 등을 정의했고, 변수로 관리하면 어떤 이점이 있는지 구체적으로 답변할 수 있는가? |
+| ☐ | 2-4 | onclick 인라인 속성 대신 addEventListener를 사용한 이유를 두 방식의 차이를 비교하여 제시할 수 있는가? |
+
+### 항목 3
+
+| 체크 | 번호 | 평가기준 |
+| :---: | :---: | :--- |
+| ☐ | 3-1 | 다크 모드, API 호출, 폼 유효성 검사 중 하나를 예시로 들어, "이벤트 → 상태 변경 → 화면 업데이트" 흐름이 코드에서 어떻게 이어지는지 따라가며 짚어줄 수 있는가? |
+| ☐ | 3-2 | async/await와 try/catch를 사용하여 API 호출 성공과 실패를 어떻게 분기 처리했는지 코드 흐름을 따라 답변할 수 있는가? |
+| ☐ | 3-3 | map, filter 등 배열 메서드를 활용하여 GitHub 데이터를 카드 UI로 변환하는 과정을 단계별로 정리할 수 있는가? |
+| ☐ | 3-4 | Flexbox와 Grid를 각각 어디에 적용했는지 확인하고 해당 상황에서 그 방식을 선택한 이유를 비교하여 설명할 수 있는가? |
+
+### 항목 4
+
+| 체크 | 번호 | 평가기준 |
+| :---: | :---: | :--- |
+| ☐ | 4-1 | 상태(STATE) 객체를 따로 만들어 관리한 이유는 무엇이며, 그냥 변수로 처리하면 안 되는지 설명할 수 있는가? |
+| ☐ | 4-2 | 반응형 디자인에서 "모바일 퍼스트"로 작성한 이유를 이야기할 수 있는가? |
+
+---
+
+## 미션 구현 체크리스트
 
 > **기호 안내**: ✅ 완료 / 충족 | ❌ 미진행 / 추가 작업 필요
 
