@@ -25,7 +25,7 @@ HTML5, CSS3, JavaScript (ES6+), GitHub REST API, GitHub Pages, Google Fonts를 �
 
 ## 평가기준
 
-### 항목 1
+### [항목 1](<eveluation/항목 1>)
 
 1-1. 브라우저 창 크기를 줄였을 때 레이아웃이 모바일에 맞게 변경되는가?
 
