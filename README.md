@@ -47,11 +47,15 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 
 | 구분 | 사용자 이벤트 | 상태 변경 | 화면 업데이트 |
 | :--- | :--- | :--- | :--- |
-| **중앙 상태 관리** | 애플리케이션 전반 | 단일 상태 객체 `STATE` (`theme`, `allRepos`, `currentFilter`, `isLoadingRepos`) | 상태 변경 시 해당 UI 컴포넌트 렌더 함수 실행 |
-| **다크 모드** | 테마 토글 버튼 클릭 | `STATE.theme` (`dark` ↔ `light`) 전환, `localStorage` 갱신 | `renderTheme()` 호출, `data-theme` 속성 및 아이콘 전환 |
-| **외부 API** | 페이지 로드 / 재시도 클릭 | 비동기 API 요청 상태 (`STATE.isLoadingRepos`, `STATE.allRepos`) | 로딩 스피너 → 카드 그리드 / 에러 안내 / 빈 화면 동적 렌더링 |
-| **폼 검증** | 입력값 변경(`input`) / 제출(`submit`) | 필드별 유효성 상태 (`valid` ↔ `invalid`) | 에러 메시지 실시간 노출/제거, `aria-invalid` 갱신, 완료 문구 표시 |
-| **필터링 (보너스)** | 언어별 필터 버튼 클릭 | `STATE.currentFilter` 상태 변경 (`All`, 언어명, `Other`) | 해당 언어 프로젝트 카드만 필터링하여 재렌더링, 활성 버튼 표시 |
+| **중앙 상태 관리** | 애플리케이션 전반 | `STATE.theme`, `isMenuOpen`, `form.errors/status`, `allRepos`, `currentFilter`, `repoStatus` | 렌더 함수가 STATE를 DOM에 표현하며, DOM 속성으로 상태를 판단하지 않음 |
+| **다크 모드** | 테마 토글 버튼 클릭 | `STATE.theme` (`dark` ↔ `light`) 전환 | `renderTheme()` → `dataset.theme` 및 `ariaPressed` 반영 → `localStorage`에 테마 저장 |
+| **메뉴** | 햄버거 버튼 / 메뉴 링크 클릭 | `STATE.isMenuOpen` 갱신 | `renderMenu()` → `classList.toggle('active', 상태)` 및 `ariaExpanded`/`ariaLabel` 반영 |
+| **외부 API** | 페이지 로드 / 재시도 클릭 | `STATE.repoStatus` (`idle`, `loading`, `success`, `empty`, `error`) 및 `allRepos` 갱신 | `renderRepoState()` → 로딩 메시지 / 카드 목록 / 빈 안내 / 오류 안내, 재시도 버튼 표시 및 비활성화 |
+| **폼 검증** | 입력값 변경(`input`) / 제출(`submit`) | `getFieldError()`로 `STATE.form.errors` 갱신, `STATE.form.status` 갱신 | `renderFieldError()` → 메시지 + `ariaInvalid`, `renderFormStatus()` → 제출 결과 안내 |
+| **필터링 (보너스)** | 언어별 필터 버튼 클릭 | `STATE.currentFilter` 변경 (`all`, 언어명, `Other`) | `renderFilterButtons()` → 활성 버튼 + `aria-pressed`, `applyFilter()` → `renderProjects()`로 카드 재렌더링 |
+
+`localStorage`는 테마를 새로고침 후에도 기억하는 저장소입니다. 화면은 STATE를 읽는 렌더 함수가 바꿉니다. 스크롤 위치와 관찰 결과는 브라우저에서 읽고, 타이핑 인덱스·타이머는 해당 기능 내부에서 관리합니다.
+이메일은 첫 `input`부터 검증하며, `blur`나 제출을 기다리지 않습니다. 성공 제출 후 입력값과 오류 상태를 초기화하고 연습용 폼 안내를 표시합니다.
 
 ---
 
@@ -64,10 +68,10 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 | 체크 | 번호 | 평가기준 | 관련 코드 |
 | :---: | :---: | :--- | :--- |
 | ☐ | 1-1 | 브라우저 창 크기를 줄였을 때 레이아웃이 모바일에 맞게 변경되는가? | [CSS 모바일 기본 메뉴](https://github.com/hauteville1862/codyssey-b1-1/blob/main/css/style.css#L132-L133), [768px 화면 규칙](https://github.com/hauteville1862/codyssey-b1-1/blob/main/css/style.css#L654), [카드 Grid](https://github.com/hauteville1862/codyssey-b1-1/blob/main/css/style.css#L390) |
-| ☐ | 1-2 | 테마 토글 버튼 클릭 시 다크/라이트 모드가 전환되고, 새로고침 후에도 유지되는가? | [테마 상태·저장·화면 반영](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L12-L56), [다크 모드 CSS](https://github.com/hauteville1862/codyssey-b1-1/blob/main/css/style.css#L48-L70) |
-| ☐ | 1-3 | 햄버거 메뉴, 스크롤 애니메이션, 맨 위로 가기 버튼 등이 정상 동작하는가? | [햄버거 메뉴](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L56), [스크롤 애니메이션](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L162), [맨 위로 가기](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L184) |
+| ☐ | 1-2 | 테마 토글 버튼 클릭 시 다크/라이트 모드가 전환되고, 새로고침 후에도 유지되는가? | [테마 상태·저장·화면 반영](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L20), [다크 모드 CSS](https://github.com/hauteville1862/codyssey-b1-1/blob/main/css/style.css#L48-L70) |
+| ☐ | 1-3 | 햄버거 메뉴, 스크롤 애니메이션, 맨 위로 가기 버튼 등이 정상 동작하는가? | [햄버거 메뉴](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L55), [스크롤 애니메이션](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L157), [맨 위로 가기](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L179) |
 | ☐ | 1-4 | GitHub API에서 데이터를 불러와 화면에 표시되고, 로딩/에러/빈 상태가 구분되는가? | [API 요청과 상태 처리](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L299) |
-| ☐ | 1-5 | 필수 입력값 누락, 이메일 형식 오류 시 즉각적인 피드백이 표시되는가? | [폼 검증 코드](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L85), [폼 HTML](https://github.com/hauteville1862/codyssey-b1-1/blob/main/index.html#L105) |
+| ☐ | 1-5 | 필수 입력값 누락, 이메일 형식 오류 시 즉각적인 피드백이 표시되는가? | [폼 검증 코드](https://github.com/hauteville1862/codyssey-b1-1/blob/main/js/script.js#L79), [폼 HTML](https://github.com/hauteville1862/codyssey-b1-1/blob/main/index.html#L105) |
 
 ### 항목 2
 
@@ -186,7 +190,7 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 | 상태 | 세부 항목 | 세부 요건 |
 | :---: | :--- | :--- |
 | ✅ | GitHub API 비동기 호출 | • `fetch` + `async/await` 활용<br>• 엔드포인트: `https://api.github.com/users/hauteville1862/repos` |
-| ✅ | 로딩 상태 UI | • 요청 대기 중 "데이터를 불러오는 중입니다..." 로딩 스피너 표시 |
+| ✅ | 로딩 상태 UI | • 요청 대기 중 "데이터를 불러오는 중입니다..." 로딩 메시지 표시 |
 | ✅ | 성공 상태 UI | • 받아온 저장소 카드 목록 동적 렌더링 |
 | ✅ | 에러 상태 UI & 재시도 | • `try/catch` 예외 처리, 에러 메시지 노출 및 [다시 시도] 버튼 제공 |
 | ✅ | 빈 상태 UI | • 등록된 저장소가 없을 때 "표시할 프로젝트가 없습니다." 안내 표시 |
@@ -197,11 +201,13 @@ HTML, CSS, JavaScript만으로 만든 반응형 포트폴리오 웹사이트입�
 
 | 상태 | 흐름 항목 | 세부 흐름 설명 |
 | :---: | :--- | :--- |
-| ✅ | 단일 상태 객체 (`STATE`) | `theme`, `allRepos`, `currentFilter`, `isLoadingRepos`를 단일 중앙 상태 객체(`STATE`)로 통합 관리 |
-| ✅ | 테마 상태 흐름 | 토글 클릭 → `STATE.theme` 갱신 & 저장 → `renderTheme()` 화면 반영 |
-| ✅ | API 요청 상태 흐름 | 페이지 로드/재시도 클릭 → `STATE.isLoadingRepos` 및 API 응답 갱신 → 카드 그리드 동적 렌더링 |
-| ✅ | 폼 검증 상태 흐름 | 실시간 `input`/`submit` → 유효성 상태 판단 → 에러 메시지 노출/초기화 및 완료 안내 |
-| ✅ | 필터 상태 흐름 | 필터 버튼 클릭 → `STATE.currentFilter` 갱신 → 일치하는 언어 카드만 재렌더링 |
+| ✅ | 단일 상태 객체 (`STATE`) | `theme`, `isMenuOpen`, `form.errors/status`, `allRepos`, `currentFilter`, `repoStatus` 관리 |
+| ✅ | 테마 상태 흐름 | 토글 클릭 → `STATE.theme` → `renderTheme()` → `data-theme`/ARIA → `localStorage` 저장 |
+| ✅ | API 요청 상태 흐름 | 페이지 로드/재시도 클릭 → `STATE.repoStatus`/`allRepos` → `renderRepoState()` → 메시지·재시도·카드 목록 |
+| ✅ | 폼 검증 상태 흐름 | `input`/`submit` → `STATE.form.errors/status` → `renderFieldError()`/`renderFormStatus()` → 오류·ARIA·완료 안내 |
+| ✅ | 필터 상태 흐름 | 클릭 → `STATE.currentFilter` → 필터 버튼과 프로젝트 목록 재렌더링 |
+
+2026-10-12 리팩터링은 소스와 정적 검사로 확인합니다. 위 구현 체크는 이 버전의 브라우저 동작 검증 완료를 뜻하지 않으며, E05 입력 중 이메일 오류 표시 등 런타임 확인은 별도로 필요합니다.
 
 ---
 

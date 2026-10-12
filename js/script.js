@@ -6,9 +6,14 @@
 // ==========================================================================
 const STATE = {
     theme: 'light',            // 테마 상태: 'light' | 'dark'
+    isMenuOpen: false,         // 모바일 메뉴 열림 여부
+    form: {
+        errors: { name: '', email: '', message: '' },
+        status: ''             // 연습용 폼의 제출 결과 메시지
+    },
     allRepos: [],              // API로 받아온 전체 프로젝트 목록
     currentFilter: 'all',      // 현재 선택된 언어 필터: 'all' | 언어명 | 'Other'
-    isLoadingRepos: false      // API 호출 로딩 진행 여부
+    repoStatus: 'idle'         // 'idle' | 'loading' | 'success' | 'empty' | 'error'
 };
 const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -26,13 +31,8 @@ try {
 
 // 테마 상태(STATE.theme)를 화면 DOM에 반영하는 렌더 함수
 function renderTheme() {
-    if (STATE.theme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        toggleBtn.setAttribute('aria-pressed', 'true');
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-        toggleBtn.setAttribute('aria-pressed', 'false');
-    }
+    document.documentElement.dataset.theme = STATE.theme;
+    toggleBtn.ariaPressed = String(STATE.theme === 'dark');
 }
 renderTheme();
 
@@ -56,21 +56,23 @@ toggleBtn.addEventListener('click', () => {
 const hamburgerBtn = document.querySelector('#hamburger-btn');
 const navMenu = document.querySelector('#nav-menu');
 
+function renderMenu() {
+    navMenu.classList.toggle('active', STATE.isMenuOpen);
+    hamburgerBtn.ariaExpanded = String(STATE.isMenuOpen);
+    hamburgerBtn.ariaLabel = STATE.isMenuOpen ? '메뉴 닫기' : '메뉴 열기';
+}
+renderMenu();
+
 hamburgerBtn.addEventListener('click', () => {
-    navMenu.classList.toggle('active');
-    const isOpen = navMenu.classList.contains('active');
-    hamburgerBtn.setAttribute('aria-expanded', isOpen);
-    hamburgerBtn.setAttribute('aria-label', isOpen ? '메뉴 닫기' : '메뉴 열기');
+    STATE.isMenuOpen = !STATE.isMenuOpen;
+    renderMenu();
 });
 
 // 모바일 환경에서 메뉴 링크 클릭 시 자동으로 메뉴 닫기
 navMenu.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
-        if (navMenu.classList.contains('active')) {
-            navMenu.classList.remove('active');
-            hamburgerBtn.setAttribute('aria-expanded', 'false');
-            hamburgerBtn.setAttribute('aria-label', '메뉴 열기');
-        }
+        STATE.isMenuOpen = false;
+        renderMenu();
     });
 });
 
@@ -81,21 +83,27 @@ const nameInput = document.querySelector('#name');
 const emailInput = document.querySelector('#email');
 const messageInput = document.querySelector('#message');
 
-// 개별 필드 검증 함수
-function validateField(input, errorId, customCheck) {
-    const errorEl = document.querySelector(`#${errorId}`);
-    const value = input.value.trim();
-    let message = '';
+// 검증은 오류 문자열만 계산하고, 화면은 렌더 함수가 갱신한다.
+function getFieldError(value, customCheck) {
+    const trimmedValue = value.trim();
+    if (trimmedValue === '') return '이 항목을 입력해주세요.';
+    return customCheck ? customCheck(trimmedValue) : '';
+}
 
-    if (value === '') {
-        message = '이 항목을 입력해주세요.';
-    } else if (customCheck) {
-        message = customCheck(value);
-    }
+function renderFieldError(fieldName) {
+    const error = STATE.form.errors[fieldName];
+    document.querySelector(`#${fieldName}-error`).textContent = error;
+    document.querySelector(`#${fieldName}`).ariaInvalid = String(error !== '');
+}
 
-    errorEl.textContent = message;
-    input.setAttribute('aria-invalid', message ? 'true' : 'false');
-    return message === '';
+function renderFormStatus() {
+    formMsg.textContent = STATE.form.status;
+    formMsg.classList.toggle('form-success', STATE.form.status !== '');
+}
+
+function renderForm() {
+    ['name', 'email', 'message'].forEach(renderFieldError);
+    renderFormStatus();
 }
 
 // 이메일 형식 검증 (이름@도메인.확장자)
@@ -109,53 +117,41 @@ function checkEmailFormat(value) {
 // input 이벤트: 입력 중 실시간 검증
 contactForm.addEventListener('input', () => {
     // 새 입력에는 이전 제출의 성공 안내를 표시하지 않는다.
-    formMsg.textContent = '';
-    formMsg.className = '';
+    STATE.form.status = '';
+    renderFormStatus();
 });
 
 nameInput.addEventListener('input', () => {
-    validateField(nameInput, 'name-error');
-});
-// 이메일은 입력을 마치거나 제출할 때 처음 검사한다.
-emailInput.addEventListener('blur', () => {
-    validateField(emailInput, 'email-error', checkEmailFormat);
+    STATE.form.errors.name = getFieldError(nameInput.value);
+    renderFieldError('name');
 });
 emailInput.addEventListener('input', () => {
-    // 한 번 검사한 뒤에는 입력하면서 오류가 해소되는지 확인한다.
-    // 제출 성공 후 aria-invalid가 제거되면 다시 첫 입력 상태가 된다.
-    if (emailInput.hasAttribute('aria-invalid')) {
-        validateField(emailInput, 'email-error', checkEmailFormat);
-    }
+    STATE.form.errors.email = getFieldError(emailInput.value, checkEmailFormat);
+    renderFieldError('email');
 });
 messageInput.addEventListener('input', () => {
-    validateField(messageInput, 'message-error');
+    STATE.form.errors.message = getFieldError(messageInput.value);
+    renderFieldError('message');
 });
 
 // submit 이벤트: 전체 검증
 contactForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
-    const isNameValid = validateField(nameInput, 'name-error');
-    const isEmailValid = validateField(emailInput, 'email-error', checkEmailFormat);
-    const isMessageValid = validateField(messageInput, 'message-error');
+    STATE.form.errors.name = getFieldError(nameInput.value);
+    STATE.form.errors.email = getFieldError(emailInput.value, checkEmailFormat);
+    STATE.form.errors.message = getFieldError(messageInput.value);
+    STATE.form.status = '';
+    renderForm();
 
-    if (!isNameValid || !isEmailValid || !isMessageValid) {
-        formMsg.textContent = '';
-        formMsg.className = '';
-        return;
-    }
+    const { name, email, message } = STATE.form.errors;
+    if (name || email || message) return;
 
     // 성공 상태 (연습용 폼 안내)
-    formMsg.textContent = '입력 내용이 확인되었습니다. 실제 이메일은 전송되지 않았습니다.';
-    formMsg.className = 'form-success';
     contactForm.reset();
-    // 성공 후 에러 표시 초기화
-    contactForm.querySelectorAll('.field-error').forEach(error => {
-        error.textContent = '';
-    });
-    contactForm.querySelectorAll('[aria-invalid]').forEach(input => {
-        input.removeAttribute('aria-invalid');
-    });
+    STATE.form.errors = { name: '', email: '', message: '' };
+    STATE.form.status = '입력 내용이 확인되었습니다. 실제 이메일은 전송되지 않았습니다.';
+    renderForm();
 });
 
 // 4. 섹션 전체 대신 제목을 관찰해, 목록이 길어져도 등장하게 한다.
@@ -239,10 +235,14 @@ function renderProjects(reposToRender) {
 }
 
 // 필터 버튼 동적 생성 함수
-function renderFilterButtons(repos) {
+function renderFilterButtons() {
+    if (STATE.repoStatus !== 'success') {
+        filterContainer.innerHTML = '';
+        return;
+    }
     const filterList = ['all'];
     let hasUntagged = false;
-    repos.forEach(repo => {
+    STATE.allRepos.forEach(repo => {
         if (!repo.language) {
             hasUntagged = true;
         } else if (!filterList.includes(repo.language)) {
@@ -284,30 +284,50 @@ filterContainer.addEventListener('click', (event) => {
     // 상태 변경
     STATE.currentFilter = selectedLang;
 
-    // 버튼 활성 상태(UI) 갱신
-    filterContainer.querySelectorAll('.filter-btn').forEach(b => {
-        const active = b.dataset.language === STATE.currentFilter;
-        b.classList.toggle('active', active);
-        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+    // 버튼 활성 상태는 STATE에서 파생한다.
+    renderFilterButtons();
+    // 버튼 재생성 후에도 키보드 포커스를 같은 필터에 유지한다.
+    filterContainer.querySelectorAll('.filter-btn').forEach(button => {
+        if (button.dataset.language === STATE.currentFilter) button.focus();
     });
 
     // 필터링 적용 및 화면 렌더링
     applyFilter();
 });
 
-// GitHub API 호출 함수
+// API 상태에 따른 메시지, 재시도 버튼, 목록을 한 곳에서 표현한다.
+function renderRepoState() {
+    const status = STATE.repoStatus;
+    apiStatus.hidden = status === 'idle' || status === 'success';
+    apiStatus.classList.toggle('api-error', status === 'error');
+    retryReposBtn.hidden = status !== 'error';
+    retryReposBtn.disabled = status === 'loading';
+
+    if (status === 'loading') {
+        apiStatus.textContent = '데이터를 불러오는 중입니다...';
+    } else if (status === 'empty') {
+        apiStatus.textContent = '표시할 프로젝트가 없습니다.';
+    } else if (status === 'error') {
+        apiStatus.textContent = '프로젝트를 불러올 수 없습니다. 다시 시도해주세요.';
+    } else {
+        apiStatus.textContent = '';
+    }
+
+    renderFilterButtons();
+    if (status === 'success') {
+        applyFilter();
+    } else {
+        repoList.innerHTML = '';
+    }
+}
+
+// GitHub API 호출 함수: 상태를 갱신한 뒤 렌더 함수에 화면 반영을 맡긴다.
 async function fetchGitHubRepos() {
-    if (STATE.isLoadingRepos) return;
-    STATE.isLoadingRepos = true;
+    if (STATE.repoStatus === 'loading') return;
+    STATE.repoStatus = 'loading';
     STATE.allRepos = [];
     STATE.currentFilter = 'all';
-    retryReposBtn.disabled = true;
-    retryReposBtn.hidden = true;
-    repoList.innerHTML = '';
-    filterContainer.innerHTML = '';
-    apiStatus.hidden = false;
-    apiStatus.classList.remove('api-error');
-    apiStatus.textContent = "데이터를 불러오는 중입니다...";
+    renderRepoState();
 
     try {
         const response = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos`);
@@ -318,27 +338,12 @@ async function fetchGitHubRepos() {
 
         const repos = await response.json();
 
-        // 빈 상태 UI 처리
-        if (repos.length === 0) {
-            apiStatus.textContent = "표시할 프로젝트가 없습니다.";
-            return;
-        }
-
-        // 데이터 보관 및 화면 렌더링
         STATE.allRepos = repos;
-        apiStatus.hidden = true;
-        renderFilterButtons(STATE.allRepos);
-        applyFilter();
-
+        STATE.repoStatus = repos.length === 0 ? 'empty' : 'success';
     } catch (error) {
-        // 에러 상태 UI 처리
-        apiStatus.textContent = "프로젝트를 불러올 수 없습니다. 다시 시도해주세요.";
-        apiStatus.classList.add('api-error');
-        retryReposBtn.hidden = false;
-    } finally {
-        STATE.isLoadingRepos = false;
-        retryReposBtn.disabled = false;
+        STATE.repoStatus = 'error';
     }
+    renderRepoState();
 }
 
 retryReposBtn.addEventListener('click', fetchGitHubRepos);
