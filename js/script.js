@@ -76,6 +76,72 @@ navMenu.querySelectorAll('a').forEach(link => {
     });
 });
 
+// 앵커 이동은 거리에 따라 0.8~1.4초 동안 가속·감속한다.
+let scrollFrame = null;
+function cancelSmoothScroll() {
+    if (scrollFrame !== null) cancelAnimationFrame(scrollFrame);
+    scrollFrame = null;
+}
+
+function smoothScrollTo(top, onComplete) {
+    cancelSmoothScroll();
+    const start = window.scrollY;
+    const maxTop = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    const destination = Math.max(0, Math.min(top, maxTop));
+    const distance = destination - start;
+    if (motionPreference.matches || Math.abs(distance) < 1) {
+        window.scrollTo({ top: destination, behavior: 'instant' });
+        onComplete?.();
+        return;
+    }
+    const duration = Math.min(1400, 800 + Math.abs(distance) * 0.2);
+    const startedAt = performance.now();
+    function step(now) {
+        const progress = Math.min(1, (now - startedAt) / duration);
+        const eased = progress < 0.5
+            ? 4 * progress ** 3
+            : 1 - (-2 * progress + 2) ** 3 / 2;
+        window.scrollTo({ top: start + distance * eased, behavior: 'instant' });
+        if (progress < 1) {
+            scrollFrame = requestAnimationFrame(step);
+        } else {
+            scrollFrame = null;
+            onComplete?.();
+        }
+    }
+    scrollFrame = requestAnimationFrame(step);
+}
+
+// 사용자가 직접 스크롤하면 진행 중인 자동 이동을 즉시 취소한다.
+window.addEventListener('wheel', cancelSmoothScroll, { passive: true });
+window.addEventListener('touchstart', cancelSmoothScroll, { passive: true });
+window.addEventListener('keydown', event => {
+    if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Escape'].includes(event.key)) {
+        cancelSmoothScroll();
+    }
+});
+
+document.querySelectorAll('a[href^="#"]:not(.skip-link)').forEach(link => {
+    link.addEventListener('click', event => {
+        if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        const hash = link.getAttribute('href');
+        const target = document.getElementById(hash.slice(1));
+        if (!target) return;
+        event.preventDefault();
+        const offset = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+        // 등장 효과의 transform에 영향을 받지 않는 레이아웃 위치를 사용한다.
+        let top = 0;
+        for (let element = target; element; element = element.offsetParent) top += element.offsetTop;
+        if (window.location.hash !== hash) history.pushState(null, '', hash);
+        smoothScrollTo(top - offset, () => {
+            const hadTabindex = target.hasAttribute('tabindex');
+            if (!hadTabindex) target.setAttribute('tabindex', '-1');
+            target.focus({ preventScroll: true });
+            if (!hadTabindex) target.removeAttribute('tabindex');
+        });
+    });
+});
+
 // 3. 폼 유효성 검사 (필드별 에러 + 이메일 형식 + input 이벤트 실시간 검증)
 const contactForm = document.querySelector('#contact-form');
 const formMsg = document.querySelector('#form-msg');
@@ -164,7 +230,7 @@ const observer = new IntersectionObserver((entries) => {
             observer.unobserve(entry.target);
         }
     });
-}, { threshold: 0.2 });
+}, { threshold: 0.2, rootMargin: '0px 0px -8% 0px' });
 
 document.querySelectorAll('.fade-section').forEach(section => {
     const heading = section.querySelector('h2');
@@ -191,7 +257,7 @@ window.addEventListener('scroll', updateScrollState);
 window.addEventListener('pageshow', updateScrollState);
 updateScrollState();
 scrollTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: motionPreference.matches ? 'auto' : 'smooth' });
+    smoothScrollTo(0);
 });
 
 // 6. GitHub API 연동 및 상태(Loading/Success/Error) 처리 + 언어별 필터링 (보너스 과제)
