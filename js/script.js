@@ -402,7 +402,7 @@ async function fetchGitHubRepos() {
             throw new Error('API 호출 에러 (레이트 리밋 등)');
         }
 
-        const repos = response.json();
+        const repos = await response.json();
 
         STATE.allRepos = repos;
         STATE.repoStatus = repos.length === 0 ? 'empty' : 'success';
