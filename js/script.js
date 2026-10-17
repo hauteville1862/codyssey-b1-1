@@ -1,272 +1,96 @@
-// script.js
+// DOM 선택
+const themeButton = document.querySelector('#dark-mode-toggle');
+const menuButton = document.querySelector('#hamburger-btn');
+const navMenu = document.querySelector('#nav-menu');
+const header = document.querySelector('#header');
+const scrollTopButton = document.querySelector('#scroll-top-btn');
+const contactForm = document.querySelector('#contact-form');
+const formFields = contactForm.querySelectorAll('input, textarea');
+const formMessage = document.querySelector('#form-msg');
+const apiStatus = document.querySelector('#api-status');
+const repoList = document.querySelector('#repo-list');
+const retryButton = document.querySelector('#retry-repos');
 
-// ==========================================================================
-// 단일 중앙 상태 관리 객체 (Single Source of Truth)
-// "이벤트 발생 → STATE 상태 갱신 → 화면 렌더링(render)" 흐름으로 일관되게 관리한다.
-// ==========================================================================
+const GITHUB_USERNAME = 'hauteville1862';
+
+// 이벤트가 상태를 바꾸고, render 함수가 그 상태를 화면에 반영한다.
 const STATE = {
-    theme: 'light',            // 테마 상태: 'light' | 'dark'
-    isMenuOpen: false,         // 모바일 메뉴 열림 여부
+    theme: 'light',
+    isMenuOpen: false,
+    repos: [],
+    repoStatus: 'idle',
     form: {
         errors: { name: '', email: '', message: '' },
-        status: ''             // 연습용 폼의 제출 결과 메시지
-    },
-    allRepos: [],              // API로 받아온 전체 프로젝트 목록
-    currentFilter: 'all',      // 현재 선택된 언어 필터: 'all' | 언어명 | 'Other'
-    repoStatus: 'idle'         // 'idle' | 'loading' | 'success' | 'empty' | 'error'
-};
-const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-// 1. 다크 모드 (로컬스토리지 상태 유지 및 STATE 연동)
-const toggleBtn = document.querySelector('#dark-mode-toggle');
-try {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark' || savedTheme === 'light') {
-        STATE.theme = savedTheme;
+        successMessage: ''
     }
-} catch (error) {
-    // 저장소 접근이 차단되어도 나머지 기능은 실행한다.
-    console.warn('저장된 테마를 읽을 수 없습니다.', error);
-}
+};
+let scrollTopFrame = null;
 
-// 테마 상태(STATE.theme)를 화면 DOM에 반영하는 렌더 함수
+// 테마
 function renderTheme() {
     document.documentElement.dataset.theme = STATE.theme;
-    toggleBtn.ariaPressed = String(STATE.theme === 'dark');
+    themeButton.ariaPressed = String(STATE.theme === 'dark');
 }
-renderTheme();
 
-toggleBtn.addEventListener('click', () => {
-    // 1. 상태 갱신: STATE.theme 토글
+function toggleTheme() {
     STATE.theme = STATE.theme === 'dark' ? 'light' : 'dark';
-
-    // 2. 화면 렌더링
     renderTheme();
-
-    // 3. 부수 효과: 로컬스토리지 저장
     try {
         localStorage.setItem('theme', STATE.theme);
     } catch (error) {
-        // 저장할 수 없어도 현재 화면의 테마 전환은 유지한다.
         console.warn('테마를 저장할 수 없습니다.', error);
     }
-});
+}
 
-// 2. 모바일 햄버거 메뉴 토글
-const hamburgerBtn = document.querySelector('#hamburger-btn');
-const navMenu = document.querySelector('#nav-menu');
-
+// 메뉴
 function renderMenu() {
     navMenu.classList.toggle('active', STATE.isMenuOpen);
-    hamburgerBtn.ariaExpanded = String(STATE.isMenuOpen);
-    hamburgerBtn.ariaLabel = STATE.isMenuOpen ? '메뉴 닫기' : '메뉴 열기';
-}
-renderMenu();
-
-hamburgerBtn.addEventListener('click', () => {
-    STATE.isMenuOpen = !STATE.isMenuOpen;
-    renderMenu();
-});
-
-// 모바일 환경에서 메뉴 링크 클릭 시 자동으로 메뉴 닫기
-navMenu.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-        STATE.isMenuOpen = false;
-        renderMenu();
-    });
-});
-
-// 앵커 이동은 거리에 따라 0.8~1.4초 동안 가속·감속한다.
-let scrollFrame = null;
-function cancelSmoothScroll() {
-    if (scrollFrame !== null) cancelAnimationFrame(scrollFrame);
-    scrollFrame = null;
+    menuButton.ariaExpanded = String(STATE.isMenuOpen);
+    menuButton.ariaLabel = STATE.isMenuOpen ? '메뉴 닫기' : '메뉴 열기';
 }
 
-function smoothScrollTo(top, onComplete) {
-    cancelSmoothScroll();
-    const start = window.scrollY;
-    const maxTop = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    const destination = Math.max(0, Math.min(top, maxTop));
-    const distance = destination - start;
-    if (motionPreference.matches || Math.abs(distance) < 1) {
-        window.scrollTo({ top: destination, behavior: 'instant' });
-        onComplete?.();
-        return;
+// 폼: 검증 결과는 STATE에 기록하고, renderForm에서 화면에 반영한다.
+function updateFieldError(field) {
+    const value = field.value.trim();
+    let error = '';
+
+    if (value === '') {
+        error = '이 항목을 입력해주세요.';
+    } else if (field.name === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        error = '이메일을 이름@도메인.확장자 형식으로 입력해주세요.';
     }
-    const duration = Math.min(1400, 800 + Math.abs(distance) * 0.2);
-    const startedAt = performance.now();
-    function step(now) {
-        const progress = Math.min(1, (now - startedAt) / duration);
-        const eased = progress < 0.5
-            ? 4 * progress ** 3
-            : 1 - (-2 * progress + 2) ** 3 / 2;
-        window.scrollTo({ top: start + distance * eased, behavior: 'instant' });
-        if (progress < 1) {
-            scrollFrame = requestAnimationFrame(step);
-        } else {
-            scrollFrame = null;
-            onComplete?.();
-        }
-    }
-    scrollFrame = requestAnimationFrame(step);
-}
 
-// 사용자가 직접 스크롤하면 진행 중인 자동 이동을 즉시 취소한다.
-window.addEventListener('wheel', cancelSmoothScroll, { passive: true });
-window.addEventListener('touchstart', cancelSmoothScroll, { passive: true });
-window.addEventListener('keydown', event => {
-    if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Escape'].includes(event.key)) {
-        cancelSmoothScroll();
-    }
-});
-
-document.querySelectorAll('a[href^="#"]:not(.skip-link)').forEach(link => {
-    link.addEventListener('click', event => {
-        if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-        const hash = link.getAttribute('href');
-        const target = document.getElementById(hash.slice(1));
-        if (!target) return;
-        event.preventDefault();
-        const offset = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
-        // 등장 효과의 transform에 영향을 받지 않는 레이아웃 위치를 사용한다.
-        let top = 0;
-        for (let element = target; element; element = element.offsetParent) top += element.offsetTop;
-        if (window.location.hash !== hash) history.pushState(null, '', hash);
-        smoothScrollTo(top - offset, () => {
-            const hadTabindex = target.hasAttribute('tabindex');
-            if (!hadTabindex) target.setAttribute('tabindex', '-1');
-            target.focus({ preventScroll: true });
-            if (!hadTabindex) target.removeAttribute('tabindex');
-        });
-    });
-});
-
-// 3. 폼 유효성 검사 (필드별 에러 + 이메일 형식 + input 이벤트 실시간 검증)
-const contactForm = document.querySelector('#contact-form');
-const formMsg = document.querySelector('#form-msg');
-const nameInput = document.querySelector('#name');
-const emailInput = document.querySelector('#email');
-const messageInput = document.querySelector('#message');
-
-// 검증은 오류 문자열만 계산하고, 화면은 렌더 함수가 갱신한다.
-function getFieldError(value, customCheck) {
-    const trimmedValue = value.trim();
-    if (trimmedValue === '') return '이 항목을 입력해주세요.';
-    return customCheck ? customCheck(trimmedValue) : '';
-}
-
-function renderFieldError(fieldName) {
-    const error = STATE.form.errors[fieldName];
-    document.querySelector(`#${fieldName}-error`).textContent = error;
-    document.querySelector(`#${fieldName}`).ariaInvalid = String(error !== '');
-}
-
-function renderFormStatus() {
-    formMsg.textContent = STATE.form.status;
-    formMsg.classList.toggle('form-success', STATE.form.status !== '');
+    STATE.form.errors[field.name] = error;
 }
 
 function renderForm() {
-    ['name', 'email', 'message'].forEach(renderFieldError);
-    renderFormStatus();
+    formFields.forEach(field => {
+        const error = STATE.form.errors[field.name];
+        const errorElement = document.querySelector(`#${field.name}-error`);
+        errorElement.textContent = error;
+        field.ariaInvalid = String(error !== '');
+    });
+    formMessage.textContent = STATE.form.successMessage;
+    formMessage.classList.toggle('form-success', STATE.form.successMessage !== '');
 }
 
-// 이메일 형식 검증 (이름@도메인.확장자)
-function checkEmailFormat(value) {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        return '이메일을 이름@도메인.확장자 형식으로 입력해주세요.';
-    }
-    return '';
-}
-
-// input 이벤트: 입력 중 실시간 검증
-contactForm.addEventListener('input', () => {
-    // 새 입력에는 이전 제출의 성공 안내를 표시하지 않는다.
-    STATE.form.status = '';
-    renderFormStatus();
-});
-
-nameInput.addEventListener('input', () => {
-    STATE.form.errors.name = getFieldError(nameInput.value);
-    renderFieldError('name');
-});
-emailInput.addEventListener('input', () => {
-    STATE.form.errors.email = getFieldError(emailInput.value, checkEmailFormat);
-    renderFieldError('email');
-});
-messageInput.addEventListener('input', () => {
-    STATE.form.errors.message = getFieldError(messageInput.value);
-    renderFieldError('message');
-});
-
-// submit 이벤트: 전체 검증
-contactForm.addEventListener('submit', (event) => {
+function submitContactForm(event) {
     event.preventDefault();
-
-    STATE.form.errors.name = getFieldError(nameInput.value);
-    STATE.form.errors.email = getFieldError(emailInput.value, checkEmailFormat);
-    STATE.form.errors.message = getFieldError(messageInput.value);
-    STATE.form.status = '';
-    renderForm();
+    formFields.forEach(updateFieldError);
+    STATE.form.successMessage = '';
 
     const { name, email, message } = STATE.form.errors;
-    if (name || email || message) return;
-
-    // 성공 상태 (연습용 폼 안내)
-    contactForm.reset();
-    STATE.form.errors = { name: '', email: '', message: '' };
-    STATE.form.status = '입력 내용이 확인되었습니다. 실제 이메일은 전송되지 않았습니다.';
-    renderForm();
-});
-
-// 4. 섹션 전체 대신 제목을 관찰해, 목록이 길어져도 등장하게 한다.
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.2) {
-            const section = entry.target.closest('.fade-section');
-            section.classList.remove('reveal-pending');
-            section.classList.add('visible');
-            observer.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.2, rootMargin: '0px 0px -8% 0px' });
-
-document.querySelectorAll('.fade-section').forEach(section => {
-    const heading = section.querySelector('h2');
-    if (heading) {
-        section.classList.add('reveal-pending');
-        observer.observe(heading);
-    } else {
-        section.classList.add('visible');
+    if (name || email || message) {
+        renderForm();
+        return;
     }
-});
 
-// 5. 스크롤 탑 버튼 + 네비게이션 스크롤 스타일 변경
-const scrollTopBtn = document.querySelector('#scroll-top-btn');
-const header = document.querySelector('#header');
-
-function updateScrollState() {
-    // 스크롤 300px 이상에서 스크롤 탑 버튼 표시
-    scrollTopBtn.hidden = window.scrollY < 300;
-
-    // 스크롤 60px 이상에서 네비게이션 배경색 변경
-    header.classList.toggle('scrolled', window.scrollY >= 60);
+    contactForm.reset();
+    STATE.form.successMessage = '입력 내용이 확인되었습니다. 실제 이메일은 전송되지 않았습니다.';
+    renderForm();
 }
-window.addEventListener('scroll', updateScrollState);
-window.addEventListener('pageshow', updateScrollState);
-updateScrollState();
-scrollTopBtn.addEventListener('click', () => {
-    smoothScrollTo(0);
-});
 
-// 6. GitHub API 연동 및 상태(Loading/Success/Error) 처리 + 언어별 필터링 (보너스 과제)
-const GITHUB_USERNAME = 'hauteville1862'; // 현재 저장소의 GitHub 소유자
-const apiStatus = document.querySelector('#api-status');
-const repoList = document.querySelector('#repo-list');
-const retryReposBtn = document.querySelector('#retry-repos');
-const filterContainer = document.querySelector('#project-filters');
-
+// GitHub 프로젝트
 // API의 글자를 HTML 태그나 속성으로 해석하지 않도록 바꾼다.
 function escapeHtml(value) {
     return String(value)
@@ -277,97 +101,40 @@ function escapeHtml(value) {
         .replaceAll("'", '&#39;');
 }
 
-// 전달받은 프로젝트 목록을 카드로 표시한다. (map + 구조분해 할당)
-function renderProjects(reposToRender) {
-    if (reposToRender.length === 0) {
-        repoList.innerHTML = '<p class="repo-empty-filter">선택한 언어의 프로젝트가 없습니다.</p>';
-        return;
+// 카드 한 개에 표시할 값을 준비한 뒤 HTML로 만든다.
+function createProjectCard(repo) {
+    const { name, html_url, description, language, stargazers_count } = repo;
+    const displayDescription = description || '설명이 없습니다.';
+    const displayLanguage = language || 'Other';
+    let starsHtml = '';
+    if (stargazers_count > 0) {
+        starsHtml = `<span class="repo-stars">★ ${escapeHtml(stargazers_count)}</span>`;
     }
 
-    const htmlString = reposToRender.map(({ name, html_url, description, language, stargazers_count }) => `
+    return `
         <article class="card">
             <div class="card-body">
                 <h3><a href="${escapeHtml(html_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(name)}</a></h3>
-                <p>${escapeHtml(description || '설명이 없습니다.')}</p>
+                <p>${escapeHtml(displayDescription)}</p>
             </div>
             <div class="card-meta">
-                <span class="repo-lang">${escapeHtml(language || 'Other')}</span>
-                ${stargazers_count > 0 ? `<span class="repo-stars">★ ${escapeHtml(stargazers_count)}</span>` : ''}
+                <span class="repo-lang">${escapeHtml(displayLanguage)}</span>
+                ${starsHtml}
             </div>
         </article>
-    `).join('');
-
-    repoList.innerHTML = htmlString;
+    `;
 }
 
-// 필터 버튼 동적 생성 함수
-function renderFilterButtons() {
-    if (STATE.repoStatus !== 'success') {
-        filterContainer.innerHTML = '';
-        return;
-    }
-    const filterList = ['all'];
-    let hasUntagged = false;
-    STATE.allRepos.forEach(repo => {
-        if (!repo.language) {
-            hasUntagged = true;
-        } else if (!filterList.includes(repo.language)) {
-            filterList.push(repo.language);
-        }
-    });
-    if (hasUntagged) {
-        filterList.push('Other');
-    }
-
-    filterContainer.innerHTML = filterList.map(lang => {
-        const label = lang === 'all' ? 'All' : lang;
-        const isActive = lang === STATE.currentFilter;
-        return `<button type="button" class="filter-btn ${isActive ? 'active' : ''}" data-language="${escapeHtml(lang)}" aria-pressed="${isActive}">${escapeHtml(label)}</button>`;
-    }).join('');
+function renderProjects() {
+    const cards = STATE.repos.map(createProjectCard);
+    repoList.innerHTML = cards.join('');
 }
 
-// filter로 선택한 언어의 프로젝트만 골라 화면을 갱신한다.
-function applyFilter() {
-    let filtered;
-    if (STATE.currentFilter === 'all') {
-        filtered = STATE.allRepos;
-    } else if (STATE.currentFilter === 'Other') {
-        filtered = STATE.allRepos.filter(repo => !repo.language);
-    } else {
-        filtered = STATE.allRepos.filter(repo => repo.language === STATE.currentFilter);
-    }
-    renderProjects(filtered);
-}
-
-// 필터 영역에서 클릭한 버튼을 찾는다.
-filterContainer.addEventListener('click', (event) => {
-    const btn = event.target.closest('.filter-btn');
-    if (!btn) return;
-
-    const selectedLang = btn.dataset.language;
-    if (selectedLang === STATE.currentFilter) return;
-
-    // 상태 변경
-    STATE.currentFilter = selectedLang;
-
-    // 버튼 활성 상태는 STATE에서 파생한다.
-    renderFilterButtons();
-    // 버튼 재생성 후에도 키보드 포커스를 같은 필터에 유지한다.
-    filterContainer.querySelectorAll('.filter-btn').forEach(button => {
-        if (button.dataset.language === STATE.currentFilter) button.focus();
-    });
-
-    // 필터링 적용 및 화면 렌더링
-    applyFilter();
-});
-
-// API 상태에 따른 메시지, 재시도 버튼, 목록을 한 곳에서 표현한다.
 function renderRepoState() {
     const status = STATE.repoStatus;
     apiStatus.hidden = status === 'idle' || status === 'success';
     apiStatus.classList.toggle('api-error', status === 'error');
-    retryReposBtn.hidden = status !== 'error';
-    retryReposBtn.disabled = status === 'loading';
+    retryButton.hidden = status !== 'error';
 
     if (status === 'loading') {
         apiStatus.textContent = '데이터를 불러오는 중입니다...';
@@ -379,32 +146,30 @@ function renderRepoState() {
         apiStatus.textContent = '';
     }
 
-    renderFilterButtons();
     if (status === 'success') {
-        applyFilter();
+        renderProjects();
     } else {
         repoList.innerHTML = '';
     }
 }
 
-// GitHub API 호출 함수: 상태를 갱신한 뒤 렌더 함수에 화면 반영을 맡긴다.
 async function fetchGitHubRepos() {
     if (STATE.repoStatus === 'loading') return;
     STATE.repoStatus = 'loading';
-    STATE.allRepos = [];
-    STATE.currentFilter = 'all';
+    STATE.repos = [];
     renderRepoState();
 
     try {
         const response = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos`);
-
         if (!response.ok) {
-            throw new Error('API 호출 에러 (레이트 리밋 등)');
+            throw new Error('GitHub API 요청 실패: ' + response.status);
         }
 
         const repos = await response.json();
-
-        STATE.allRepos = repos;
+        if (!Array.isArray(repos)) {
+            throw new Error('저장소 목록 형식이 올바르지 않습니다.');
+        }
+        STATE.repos = repos;
         STATE.repoStatus = repos.length === 0 ? 'empty' : 'success';
     } catch (error) {
         STATE.repoStatus = 'error';
@@ -412,85 +177,117 @@ async function fetchGitHubRepos() {
     renderRepoState();
 }
 
-retryReposBtn.addEventListener('click', fetchGitHubRepos);
-
-// 스크립트가 로드되면 API 호출
-fetchGitHubRepos();
-
-// 7. Hero 섹션 타이핑 효과 (보너스 과제)
-const typingElement = document.querySelector('#typing-text');
-const typingCursor = document.querySelector('.typing-cursor');
-if (typingElement) {
-    const phrases = [
-        { accent: '성장하는 프론트엔드 개발자', suffix: '입니다.' },
-        { accent: 'AI의 코드를 내 것으로 만드는 학생', suffix: '입니다.' },
-        { accent: '내 언어로 배움을 설명하는 사람', suffix: '입니다.' }
-    ];
-    let phraseIndex = 0;
-    const firstItem = phrases[0];
-    let charIndex = firstItem.accent.length + firstItem.suffix.length;
-    let isDeleting = false;
-    let typingSpeed = 135;
-    let typingTimer;
-
-    function renderTyping(item, count) {
-        if (count <= item.accent.length) {
-            return `<span class="accent-text">${item.accent.substring(0, count)}</span>`;
-        } else {
-            const suffixCount = count - item.accent.length;
-            return `<span class="accent-text">${item.accent}</span>${item.suffix.substring(0, suffixCount)}`;
-        }
-    }
-
-    function typeLoop() {
-        if (motionPreference.matches) return;
-        const currentItem = phrases[phraseIndex];
-        const totalLength = currentItem.accent.length + currentItem.suffix.length;
-
-        if (isDeleting) {
-            // 한 글자씩 삭제 (백스페이스 꾹 누른 듯 매우 빠르게)
-            charIndex--;
-            typingElement.innerHTML = renderTyping(currentItem, charIndex);
-            typingSpeed = 20;
-        } else {
-            // 한 글자씩 타이핑 (또박또박 여유로운 타건감)
-            charIndex++;
-            typingElement.innerHTML = renderTyping(currentItem, charIndex);
-            typingSpeed = 135;
-        }
-
-        // 커서 색상 동기화: '입니다.' 영역에선 기본 텍스트 색, 앞 문구 영역에선 포인트 색
-        if (typingCursor) {
-            typingCursor.classList.toggle('suffix-cursor', charIndex > currentItem.accent.length);
-        }
-
-        // 문장이 완성되었을 때: 2초 동안 읽을 시간 제공
-        if (!isDeleting && charIndex === totalLength) {
-            typingSpeed = 2000;
-            isDeleting = true;
-        }
-        // 문장이 완전히 지워졌을 때: 0.35초 대기 후 다음 문구 시작
-        else if (isDeleting && charIndex === 0) {
-            isDeleting = false;
-            phraseIndex = (phraseIndex + 1) % phrases.length;
-            typingSpeed = 350;
-        }
-
-        typingTimer = setTimeout(typeLoop, typingSpeed);
-    }
-
-    // 움직임 감소 설정에서는 완성 문장을 유지한다. 설정 변경 시 기존 예약도 취소한다.
-    function syncTypingMotion() {
-        clearTimeout(typingTimer);
-        phraseIndex = 0;
-        charIndex = firstItem.accent.length + firstItem.suffix.length;
-        isDeleting = true;
-        typingElement.innerHTML = renderTyping(firstItem, charIndex);
-        if (typingCursor) typingCursor.classList.add('suffix-cursor');
-        if (!motionPreference.matches) {
-            typingTimer = setTimeout(typeLoop, 2000);
-        }
-    }
-    motionPreference.addEventListener('change', syncTypingMotion);
-    syncTypingMotion();
+// 스크롤과 섹션 등장
+function showSection(section) {
+    section.classList.remove('reveal-pending');
+    section.classList.add('visible');
 }
+
+// README에 명시된 스크롤 기준값을 유지한다.
+function updateScrollState() {
+    scrollTopButton.hidden = window.scrollY < 300;
+    header.classList.toggle('scrolled', window.scrollY >= 60);
+
+    // 제목을 지나친 위치로 이동하거나 복원되면 해당 섹션을 표시한다.
+    document.querySelectorAll('.fade-section.reveal-pending').forEach(section => {
+        if (section.querySelector('h2').getBoundingClientRect().bottom < 0) {
+            showSection(section);
+        }
+    });
+}
+
+function scrollToTop() {
+    if (scrollTopFrame !== null) {
+        cancelAnimationFrame(scrollTopFrame);
+    }
+    const startY = window.scrollY;
+    const startTime = performance.now();
+    const duration = 700;
+
+    function animateScroll(currentTime) {
+        const elapsedTime = currentTime - startTime;
+        const progress = Math.min(1, Math.max(0, elapsedTime / duration));
+        // 남은 비율을 세제곱하면 도착할수록 이동 속도가 줄어든다.
+        const remainingProgress = 1 - progress;
+        const nextY = startY * remainingProgress ** 3;
+        // 브라우저의 추가 보간 없이 각 프레임에서 계산한 위치로 이동한다.
+        window.scrollTo({ top: nextY, behavior: 'instant' });
+
+        if (progress < 1) {
+            scrollTopFrame = requestAnimationFrame(animateScroll);
+        } else {
+            scrollTopFrame = null;
+        }
+    }
+
+    scrollTopFrame = requestAnimationFrame(animateScroll);
+}
+
+function observeSections() {
+    // 섹션 전체 대신 제목을 관찰하면 긴 프로젝트 목록도 등장할 수 있다.
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.2) {
+                const section = entry.target.closest('.fade-section');
+                showSection(section);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.2, rootMargin: '0px 0px -8% 0px' });
+
+    document.querySelectorAll('.fade-section').forEach(section => {
+        section.classList.add('reveal-pending');
+        observer.observe(section.querySelector('h2'));
+    });
+}
+
+// 이벤트 연결
+themeButton.addEventListener('click', toggleTheme);
+
+menuButton.addEventListener('click', () => {
+    STATE.isMenuOpen = !STATE.isMenuOpen;
+    renderMenu();
+});
+
+navMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+        STATE.isMenuOpen = false;
+        renderMenu();
+    });
+});
+
+formFields.forEach(field => {
+    field.addEventListener('input', () => {
+        updateFieldError(field);
+        STATE.form.successMessage = '';
+        renderForm();
+    });
+});
+
+contactForm.addEventListener('submit', submitContactForm);
+retryButton.addEventListener('click', fetchGitHubRepos);
+window.addEventListener('scroll', updateScrollState);
+window.addEventListener('pageshow', updateScrollState);
+scrollTopButton.addEventListener('click', scrollToTop);
+
+// 초기화
+function initializePage() {
+    try {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+            STATE.theme = savedTheme;
+        }
+    } catch (error) {
+        // 저장소 접근이 차단되어도 다른 기능은 동작한다.
+        console.warn('저장된 테마를 읽을 수 없습니다.', error);
+    }
+
+    renderTheme();
+    renderMenu();
+    renderForm();
+    updateScrollState();
+    observeSections();
+    fetchGitHubRepos();
+}
+
+initializePage();
