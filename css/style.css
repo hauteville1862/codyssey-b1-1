@@ -609,13 +609,15 @@ input::placeholder, textarea::placeholder {
 
 /* JS가 작동할 때만 감춘다. 제목을 관찰하므로 긴 목록도 표시된다. */
 .fade-section {
-    transition: opacity 0.5s ease;
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 .fade-section.reveal-pending {
     opacity: 0;
+    transform: translateY(32px);
 }
 .fade-section.visible {
     opacity: 1;
+    transform: translateY(0);
 }
 
 /* 데스크톱 마우스 환경 전용 호버 인터랙션 (모바일 스티키 호버 방지) */
@@ -777,5 +779,6 @@ input::placeholder, textarea::placeholder {
     }
     .fade-section.reveal-pending {
         opacity: 1;
+        transform: none;
     }
 }
