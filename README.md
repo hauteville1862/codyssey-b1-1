@@ -8,7 +8,6 @@ HTML5, CSS3, JavaScript (ES6+), GitHub REST API, Google Fonts, GitHub Pages
 
 ## 링크
 
-- [GitHub 저장소](https://github.com/hauteville1862/codyssey-b1-1)
 - [배포 사이트](https://hauteville1862.github.io/codyssey-b1-1/)
 
 ## 동작 기준
