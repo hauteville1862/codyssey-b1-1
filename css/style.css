@@ -2,6 +2,7 @@
 :root {
     --bg-main: #fcfaf6;
     --bg-surface: #ffffff;
+    --bg-header-scrolled: #f3e6ea;
     --text-title: #361019;
     --text-main: #451620;
     --text-muted: #733e4a;
@@ -39,6 +40,7 @@
 [data-theme="dark"] {
     --bg-main: #181516;
     --bg-surface: #221d1f;
+    --bg-header-scrolled: #392b33;
     --text-title: #f5f3f4;
     --text-main: #cfccd0;
     --text-muted: #a59da5;
@@ -118,7 +120,7 @@ ul {
     transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
 }
 #header.scrolled {
-    background: color-mix(in srgb, var(--bg-surface) 35%, transparent);
+    background: var(--bg-header-scrolled);
     box-shadow: var(--shadow-sm);
 }
 .header-inner {
